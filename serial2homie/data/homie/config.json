@@ -1,0 +1,17 @@
+{
+    "name": "healthy-indoor-bridge-01",
+    "device_id": "bridge-01",
+    "device_stats_interval": 60,
+    "wifi": {
+      "ssid": "LOL-AP-01",
+      "password": "WLAN1lrB&bB2!AP1"
+    },
+    "mqtt": {
+      "host": "192.168.2.14",
+      "base_topic": "healthy-indoor/",
+      "port": 1883
+    },
+    "ota": {
+      "enabled": true
+    }
+  }
