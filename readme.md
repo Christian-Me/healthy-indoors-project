@@ -4,7 +4,7 @@
 
 I started this project in September 2020 as a reaction of the global COVID-19 epidemic.
 
-The need of an **as healthy as possible** indoor enviornment became obvious as it became obvious that [the virus is likely to be able to spread via aerosols](https://www.who.int/news-room/commentaries/detail/transmission-of-sars-cov-2-implications-for-infection-prevention-precautions) which could stay longer in the air and travel further inside rooms as droplets.
+The need of an **as healthy as possible** indoor environment became obvious as it became obvious that [the virus is likely to be able to spread via aerosols](https://www.who.int/news-room/commentaries/detail/transmission-of-sars-cov-2-implications-for-infection-prevention-precautions) which could stay longer in the air and travel further inside rooms as droplets.
 
 Reading this study by [Risk assessment of aerosols loaded with virus based on CO2-concentration](https://blogs.tu-berlin.de/hri_sars-cov-2/wp-content/uploads/sites/154/2020/08/hartmann_kriegel_2020_en_v3.pdf) and many other publications and working in an open space office environment I was wondering if it is possible to develop indicators for the users of the space. As humans are not good in sensing CO2 levels using sensors could be a possible way to help.
 
@@ -19,6 +19,8 @@ Even without the current covid-19 crises the problem of [health risks factors in
 This project do not claim to prevent anybody form dangerous diseases or other harm. Stay distant, wear masks, perform any possible hygienic actions, think about possible ways to avoid long stays indoors, like work from home, remote schooling.
 
 ## the Idea
+
+[[/graphics/concept-01.svg|concept diagram]]
 
 - develop a sensor network to detect accumulation of CO2 or other indicators
 - use multiple sensors to survey larger rooms, find "dead spots" and survey the effects of ventilation, air filters and other methods to improve air quality
