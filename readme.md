@@ -1,5 +1,7 @@
 #  Healthy Indoors project
 
+![monitor node](https://raw.githubusercontent.com/Christian-Me/healthy-indoors-project/master/images/monitor-01.jpeg)
+
 ## introduction
 
 I started this project in September 2020 as a reaction of the global COVID-19 epidemic.
@@ -16,11 +18,11 @@ Even without the current covid-19 crises the problem of [health risks factors in
 
 ## disclaimer
 
-This project do not claim to prevent anybody form dangerous diseases or other harm. Stay distant, wear masks, perform any possible hygienic actions, think about possible ways to avoid long stays indoors, like work from home, remote schooling.
-
-## the Idea
+This project do not claim to prevent anybody form dangerous diseases or other harm. Stay distant, wear masks, perform any possible hygiene measures, think about possible ways to avoid long stays indoors, like work from home, remote schooling.
 
 ![concept diagram](https://raw.githubusercontent.com/Christian-Me/healthy-indoors-project/master/graphics/concept-01.svg)
+
+## the Idea
 
 - develop a sensor network to detect accumulation of CO2 or other indicators
 - use multiple sensors to survey larger rooms, find "dead spots" and survey the effects of ventilation, air filters and other methods to improve air quality
@@ -38,6 +40,7 @@ This project do not claim to prevent anybody form dangerous diseases or other ha
 - students who like to build sensor networks, code, analyse the data and perform experiments
 - educators who like to teach various aspects form thermo dynamics, electronics, computer science, design, architecture, HVAC systems ... 
 - students to get experiences in working on a project remotely using digital techniques like github to exchange ideas and knowlage across borders
+- architects and engineers who like to design environments with better air quality in mind
 
 
 
