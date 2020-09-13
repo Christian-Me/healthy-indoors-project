@@ -20,7 +20,7 @@ This project do not claim to prevent anybody form dangerous diseases or other ha
 
 ## the Idea
 
-[[/graphics/concept-01.svg|concept diagram]]
+[[graphics/concept-01.svg|concept diagram]]
 
 - develop a sensor network to detect accumulation of CO2 or other indicators
 - use multiple sensors to survey larger rooms, find "dead spots" and survey the effects of ventilation, air filters and other methods to improve air quality
