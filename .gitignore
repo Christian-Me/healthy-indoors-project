@@ -6,3 +6,4 @@
 .backup
 images/.originals
 graphics/.originals
+include/credentials.h*
