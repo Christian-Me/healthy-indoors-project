@@ -64,7 +64,7 @@ To start the ESP8266 (or ESP32) is used as it is a cheap and powerful micro-cont
 
 Several networks and protocols can be used:
 
-- **[esp-now](https://www.espressif.com/en/products/software/esp-now/overview)**: Access point / router free peer to peer ad-hoc network protocol for ESP8266/32 without additional components necessary (default protocol)
+- **[esp-now](https://www.espressif.com/en/products/software/esp-now/overview)**: Access point / router free peer to peer ad-hoc network protocol for ESP8266/32 without additional components necessary (default protocol for this project)
 - **NRF24L01**: 2.4GHz transceiver modules
 - **[LoRa-Wan](https://de.wikipedia.org/wiki/Long_Range_Wide_Area_Network#Klasse_A)**: Long Range Wide Area Network - need of a gateway (public gateways are available). The monitor node can take the role of a gateway and create a local wireless network (to be investigated) and act as a bridge node too.
 - **Wifi**: access point is necessary. An ESP8266/32 monitor node can take toe role of an software-AP
@@ -87,7 +87,7 @@ some interesting gas sensors (CO2 and VOC)
   [interesting video about sensing VOC instead of CO2](https://www.youtube.com/watch?time_continue=1831&v=1niOmSsF-tk&feature=emb_logo)
 
   all tests in the current version of the project are done with three BME680
-![wemos-d1](https://raw.githubusercontent.com/Christian-Me/healthy-indoors-project/master/images/BME680.JPEG)
+![BME680](https://raw.githubusercontent.com/Christian-Me/healthy-indoors-project/master/images/BME680.JPEG)
 - **Senseair S8** promising infrared CO2 sensor from [Senseair](https://senseair.com/products/size-counts/s8-residential/) 400 to 2.000 ppm. (currently on delivery)
 
 - **MH-Z19B** Chinese CO2 infrared Sensor from [Winsen-Sensors](https://www.winsen-sensor.com/sensors/co2-sensor/mh-z19b.html) 0 to 2.000 ppm. (currently on delivery)
@@ -124,7 +124,7 @@ To connect the peer to peer network bridge nodes can join the network. A limitat
 
 ## project costs
 
-All components are selected with a price point in mind for everybody participate. Depending where (China or local) you buy the cost can be quite different. Local delivery can be 2-3x higher than orders form China including shipping.
+All components are selected with a price point in mind that everybody can participate. Depending where (China or local) you buy the cost can be quite different. Local delivery can be 2-3x higher than orders form China including shipping. (detailed information on components and where to buy could be found in the near future)
 
 - sensor node (8€-25€ BME680)
 - monitor node (6€-20€ TFT / 18-30€ e-paper)
@@ -152,7 +152,7 @@ The next steps are
 
 ## participation and contributions
 
-**The project is open for any participation as this is its main goal!**
+**The project is seeking for any participation as this is it's main goal!**
 
 - test implementations
 - school projects
