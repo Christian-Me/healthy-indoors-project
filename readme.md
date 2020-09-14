@@ -56,6 +56,8 @@ Nothing in this project is really new or innovative. Perhaps the local network i
 
 ### the micro-controller
 
+![wemos-d1](https://raw.githubusercontent.com/Christian-Me/healthy-indoors-project/master/images/wemos-d1.JPEG)
+
 To start the ESP8266 (or ESP32) is used as it is a cheap and powerful micro-controller with 2.4GHz wireless transceiver build in. Other micro-controllers like Arduino (Atmel) or STM32 are possible but will need additional components for RF-Transmissions
 
 ### the network
@@ -72,6 +74,8 @@ As esp-now runs natively on ESP8266 or ESP32 it seams like the ideal network pro
 
 ### sensor node
 
+![wemos-d1](https://raw.githubusercontent.com/Christian-Me/healthy-indoors-project/master/images/sensor-01.JPEG)
+
 The simplest sensor node reads a connected gas sensor and broadcast its readings onto the network.
 
 A Sensor node can also includes a monitor function to display its own sensor reading or if in a broadcast configuration readings of the other sensors too.
@@ -83,7 +87,7 @@ some interesting gas sensors (CO2 and VOC)
   [interesting video about sensing VOC instead of CO2](https://www.youtube.com/watch?time_continue=1831&v=1niOmSsF-tk&feature=emb_logo)
 
   all tests in the current version of the project are done with three BME680
-
+![wemos-d1](https://raw.githubusercontent.com/Christian-Me/healthy-indoors-project/master/images/BME680.JPEG)
 - **Senseair S8** promising infrared CO2 sensor from [Senseair](https://senseair.com/products/size-counts/s8-residential/) 400 to 2.000 ppm. (currently on delivery)
 
 - **MH-Z19B** Chinese CO2 infrared Sensor from [Winsen-Sensors](https://www.winsen-sensor.com/sensors/co2-sensor/mh-z19b.html) 0 to 2.000 ppm. (currently on delivery)
@@ -91,6 +95,8 @@ some interesting gas sensors (CO2 and VOC)
 - **CCS811** VOC sensor from [Sciosense](https://www.sciosense.com/products/environmental-sensors/ccs811-gas-sensor-solution/) seems interesting for battery operation as the sensor has a mcu integrated for VOC and eCO2 calculations providing a wake from deep sleep signal on programmable threshold alarm. (currently on delivery)
 
 ### monitor nodes
+
+![rgb-monitor](https://raw.githubusercontent.com/Christian-Me/healthy-indoors-project/master/images/monitor-02.JPEG)
 
 one or more monitor nodes can join the sensor network to display the air quality. Form a simple LED to RGB led strips, LCD, TFT, OLED or e-paper displays up to an alarm horn.
 
