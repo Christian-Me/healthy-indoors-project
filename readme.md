@@ -122,6 +122,12 @@ To connect the peer to peer network bridge nodes can join the network. A limitat
 
 - other bridge nodes can be implemented like *serial2thingspeak* or *serial2blynk*
 
+### data analyze
+
+Using a **bridge node** and the mqtt protocoll the sensor data can by analyzed or visualized. The default tool should be [Node-RED](https://nodered.org)
+
+![Node-RED dashboard](https://raw.githubusercontent.com/Christian-Me/healthy-indoors-project/master/graphics/node-red-dashboard-01.png)
+
 ## project costs
 
 All components are selected with a price point in mind that everybody can participate. Depending where (China or local) you buy the cost can be quite different. Local delivery can be 2-3x higher than orders form China including shipping. (detailed information on components and where to buy could be found in the near future)
@@ -168,4 +174,4 @@ The next steps are
 
 As mentioned above this project can only be a small part in fighting against the covid-19 pandemic. Other measures might be more effective but I have a strong believe that there isn't a single solution but many small actions can help flattening the second curve as it is already rolling in.
 
-Feel free to contact me.
+Feel free to contact me (cmeinert@gmx.net) or use a github issue to enable others to participate.

@@ -1,0 +1,1772 @@
+[
+    {
+        "id": "fd36bbc4.fe50d8",
+        "type": "subflow",
+        "name": "OK/Cancel helper",
+        "info": "# OK/Cancel dialog helper\n\n## description\n\nThis is a little helper to make OK/Cancel dialogs easy to implement inside a data stream\n\n## how it works\n\nIf a message arrives at the **imput** a message dialog box is triggered. The original Message is cloned into `msg.dialogHelperOrgMsg`. If the dialog sends `msg.payload` with the **passPayload** the original message is released on the second output.\n\nIf you use the message node \"with input\" enter your cancel payload instead pass payload as `msg.payload` will include the entered text.\n\nmake shure you pass `msg.socketid`of the session you like the dialog to be displayed.\n\n## configuration\n\n- **Title** ***optional** a string displayed on the title of the dialog\n- **Message** message to be displayed\n- **passPayload** the `msg.payload` expected on the imput to release to original message.\n- **cancelPayload** if this subflow is used for text imput dialogs enter your cancel payload instead pass payload als `msg.payload` will include the ented text.",
+        "category": "",
+        "in": [
+            {
+                "x": 37,
+                "y": 85,
+                "wires": [
+                    {
+                        "id": "6a44f1d4.72a75"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 343,
+                "y": 85,
+                "wires": [
+                    {
+                        "id": "6a44f1d4.72a75",
+                        "port": 1
+                    }
+                ]
+            },
+            {
+                "x": 343,
+                "y": 136,
+                "wires": [
+                    {
+                        "id": "6a44f1d4.72a75",
+                        "port": 2
+                    }
+                ]
+            }
+        ],
+        "env": [
+            {
+                "name": "title",
+                "type": "str",
+                "value": "Please Confirm",
+                "ui": {
+                    "icon": "font-awesome/fa-comment",
+                    "label": {
+                        "en-US": "Title"
+                    },
+                    "type": "input",
+                    "opts": {
+                        "types": [
+                            "str",
+                            "env"
+                        ]
+                    }
+                }
+            },
+            {
+                "name": "message",
+                "type": "str",
+                "value": "should the message pass on?",
+                "ui": {
+                    "icon": "font-awesome/fa-comment-o",
+                    "label": {
+                        "en-US": "Message"
+                    },
+                    "type": "input",
+                    "opts": {
+                        "types": [
+                            "str",
+                            "env"
+                        ]
+                    }
+                }
+            },
+            {
+                "name": "passPayload",
+                "type": "str",
+                "value": "OK",
+                "ui": {
+                    "icon": "font-awesome/fa-check-square-o",
+                    "type": "input",
+                    "opts": {
+                        "types": [
+                            "str",
+                            "env"
+                        ]
+                    },
+                    "label": {}
+                }
+            },
+            {
+                "name": "cancelPayload",
+                "type": "str",
+                "value": "Cancel"
+            }
+        ],
+        "color": "#3FADB5",
+        "icon": "font-awesome/fa-comments-o",
+        "status": {
+            "x": 343,
+            "y": 34,
+            "wires": [
+                {
+                    "id": "6a44f1d4.72a75",
+                    "port": 0
+                }
+            ]
+        }
+    },
+    {
+        "id": "6a44f1d4.72a75",
+        "type": "function",
+        "z": "fd36bbc4.fe50d8",
+        "name": "confirm",
+        "func": "var status={fill:\"\",shape:\"dot\",text:\"\"};\nif (msg!==undefined && !msg.hasOwnProperty(\"dialogHelperOrgMsg\")) { // no message in queue\n    var dialogMsg={\n        topic:env.get('title'),\n        payload:env.get('message'),\n        socketid:msg.socketid,\n        dialogHelperOrgMsg:RED.util.cloneMessage(msg)\n    };\n    status={fill:\"yellow\",shape:\"dot\",text:\"waiting for response\"};\n    return [{payload:status},dialogMsg,null];\n} else {\n    var cancelPayload=env.get('cancelPayload').toLowerCase();\n    var passPayload=env.get('passPayload').toLowerCase();\n    if (passPayload!=='') {\n        if (msg.payload.toLowerCase()===passPayload) {\n            status={fill:\"green\",shape:\"dot\",text:\"message passed\"};\n            return [{payload:status},null,msg.dialogHelperOrgMsg];\n        } else {\n            status={fill:\"blue\",shape:\"dot\",text:msg.payload+\"==(!\"+passPayload+\") message droped\"};\n            return [{payload:status},null,null];\n        }\n    } else if (cancelPayload!=='') {\n        if (msg.payload.toLowerCase()!==cancelPayload) {\n            status={fill:\"green\",shape:\"dot\",text:\"message passed\"};\n            msg.dialogHelperOrgMsg.payload.input=msg.payload; // add input to msg.payload\n            return [{payload:status},null,msg.dialogHelperOrgMsg];\n        } else {\n            status={fill:\"blue\",shape:\"dot\",text:msg.payload+\"==(\"+cancelPayload+\") message droped\"};\n            return [{payload:status},null,null];\n        }        \n    } else {\n        status={fill:\"red\",shape:\"dot\",text:\"pass or cancel payload undefined\"};\n        return [{payload:status},null,null];\n    }\n}",
+        "outputs": 3,
+        "noerr": 0,
+        "x": 196,
+        "y": 85,
+        "wires": [
+            [],
+            [],
+            []
+        ],
+        "info": "# OK/Cancel dialog helper function\n\n## description\n\nThis is a little helper to make OK/Cancel dialogs easy to implement inside a data stream\n\n## how it works\n\nIf a message arrives at the **imput** a message dialog box is triggered. The original Message is cloned into `msg.dialogHelperOrgMsg`. If the dialog sends `msg.payload` with the **passPayload** the original message is released on the second output.\n\n## envioment variables\n\n- **title** ***optional** a string displayed on the title of the dialog\n- **message** message to be displayed\n- **passPayload** the `msg.payload` expected on the imput to release to original message."
+    },
+    {
+        "id": "2924702c.b33a7",
+        "type": "subflow",
+        "name": "ui-table handler",
+        "info": "# ui-table handler\nUniversal handler for ui-table.\n## features\n- buffer table data\n- add or update individual rows or cells of the table\n- delete rows\n- clear tableData\n- handle column width\n- handle column order\n- hide und unhide columns\n- hide and unhide rows\n- records row order\n\nFor real life example see:\n\n**syslog server** for logfile like table with filters\n\n**remote device table** for dynamically updated table with context menues\n\n**irrigation system** for sortable rows\n\n## sending data to ui-tabel\n\n- sending an `array` as discribed in ui-table\n- send an `object` containing the updated properties of a table row by sending msg.<tableDataProp>.\n\n  The table is updated using the `updateOrAddData` command. You can alter the command used by adding the `msg.tabulatorCommand` and `msg.tabulatorParameter`\n\n```\nmsg.tabulatorCommand=\"addData\";\nmsg.tabulatorParameter=[true];\n```\n## configuration\n- `tabulator` json formatted object containing configuration of the table. See ui-table for more details.\n- `property` property of the msg object that contains the data to be passed to ui-table. I.e. *state* `msg.state`\n- `index` index column to identify individual rows. Each message containing data must have a unique `msg.topic` to identify the row. Messages without this `msg.topic` will be droped. It is not nessesary but possible to display the index column in the table. Do not enable editing on this column otherwise you will loose the connection and another row will be added to the table as soon as a new message arrives!\n\n   Defaults to *$topic* `msg.state.$topic`\n- `maxRows`maximum number of rows held by table widget. If grater than **0** the amount of rows in ui-table is limited. for tis to work the index row must be a Number. ´rows < currentID-maxRows´ will be deleted.\n- `maxStore`maximum number of rows stored by this node for replay if a client connects. If grater than **0** the amount of rows in flow context is limited. for this to work the index row must be a Number. ´rows < currentID-maxStore´ will be deleted.\n- `dashboard` name of the dashboard tab to only update the table if the dashboard is visible. If empty the table will be updated on every tab change and connect.\n- `context` configuration of context data. The subflow will save or cache data in the flows context using `$parent.`. \n   **tableData** caches the incoming data to restore it on `ui-control´ *change* messages.\n   **tableConfig** saves column width and order to save the interactive table layot\n   **tableEdit** saves edits on the table data otherwise it would be overwritten when new data arrives\n```json\n{\n    \"tableData\": {\n        \"name\": \"tableData\"\n    },\n    \"tableConfig\": {\n        \"name\": \"tableConfig\",\n        \"storage\": \"file\"\n    },\n    \"tableEdit\": {\n        \"name\": \"tableEdit\",\n        \"storage\": \"file\"\n    }\n}\n```\n\n## commands\ncommands can be passed by sending a object as `msg.payload`\n\n```json\n{\n    \"command\": \"delete\",\n    \"object\": \"columnOrder\"\n}\n```\n\n- `deleteTable` tableCache\n- `deleteRow` delete single row. `object` matching index property\n- `ignoreRow` delete single row and put it on an ignore list. `object` matching index property\n- `unIgnoreRow`remove row from the ignore list.  `object` matching index property\n- `unIgnoreRows`delte the ignore list. \n- `deleteRowOrder` delete custom row order\n- `deleteColumnOrder` delete custom column order\n  This is important if you add or delete columns in the tabulator config otherwise the columns most likely don`t show up\n- `deleteColumnWidth` delete custom column width\n- `columnHide` hide a column. `object` matching column field\n- `columnUnHide` unhide a column. `object` matching column field\n- `columnsUnHide` unhide all hidden columns.\n- `setMaxStore`set maximum amount of rows in cache\n- `setMaxDisplay` set maximum amout of rows in ui-table\n- `getTable` get table data (as displayed) as an array (on 2nd output)\n \n## background\nui-table warps the powerfull tabluator library. This subflow makes it easier to unleash the powerfull features of ui-table",
+        "category": "dashboard",
+        "in": [
+            {
+                "x": 54,
+                "y": 85,
+                "wires": [
+                    {
+                        "id": "5eb0bd6b.74b794"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 360,
+                "y": 85,
+                "wires": [
+                    {
+                        "id": "5eb0bd6b.74b794",
+                        "port": 1
+                    }
+                ]
+            },
+            {
+                "x": 360,
+                "y": 136,
+                "wires": [
+                    {
+                        "id": "5eb0bd6b.74b794",
+                        "port": 2
+                    }
+                ]
+            }
+        ],
+        "env": [
+            {
+                "name": "tabulator",
+                "type": "json",
+                "value": "{\"tabulator\":{\"responsiveLayout\":\"collapse\",\"responsiveLayoutCollapseStartOpen\":false,\"index\":\"$name\",\"layout\":\"fitColumns\",\"movableColumns\":true,\"groupBy\":\"\",\"columnResized\":\"function(column){     var newColumn = {         field: column._column.field,         visible: column._column.visible,         width: column._column.width,         widthFixed: column._column.widthFixed,         widthStyled: column._column.widthStyled     }; this.send({topic:this.config.topic,ui_control:{callback:'columnResized',columnWidths:newColumn}}); }\",\"columnMoved\":\"function(column, columns){     var newColumns=[];     columns.forEach(function (column) {         newColumns.push({'field': column._column.definition.field, 'title': column._column.definition.title});     });     this.send({topic:this.config.topic,ui_control:{callback:'columnMoved',columns:newColumns}}); }\",\"rowFormatter\":\"function(row){     var data = row.getData();     switch (data.$state) {         case \\\"lost\\\":             row.getElement().style.backgroundColor = \\\"#9e2e66\\\";             row.getElement().style.color = \\\"#a6a6a6\\\";             break;         case \\\"sleeping\\\":             row.getElement().style.backgroundColor = \\\"#336699\\\";             break;         case \\\"disconnected\\\":             row.getElement().style.backgroundColor = \\\"#cc3300\\\";             row.getElement().style.color = \\\"#a6a6a6\\\";             break;         case \\\"alert\\\":             row.getElement().style.backgroundColor = \\\"#A6A6DF\\\";             break;         case \\\"init\\\":             row.getElement().style.backgroundColor = \\\"#f2f20d\\\";             break;         case \\\"ready\\\":             row.getElement().style.backgroundColor = \\\"\\\";             row.getElement().style.color = \\\"\\\";             break;         } }\",\"columns\":[{\"formatter\":\"responsiveCollapse\",\"width\":30,\"minWidth\":30,\"align\":\"center\",\"resizable\":false,\"headerSort\":false,\"frozen\":true,\"title\":\"expand\",\"field\":\"expand\",\"headerVertical\":\"flip\"},{\"formatter\":\"function(cell, formatterParams, onRendered) {      var html = cell.getValue(); return html;  }\",\"title\":\"State\",\"field\":\"$stateIcon\",\"width\":100,\"frozen\":true,\"headerVertical\":\"flip\"},{\"formatter\":\"function(cell, formatterParams, onRendered) {     var html = cell.getValue(); return html;  }\",\"title\":\"Signal\",\"field\":\"signalIcon\",\"width\":100,\"frozen\":true,\"headerVertical\":\"flip\"},{\"title\":\"Name\",\"field\":\"$name\",\"width\":100,\"frozen\":true,\"headerVertical\":\"flip\"},{\"title\":\"State\",\"field\":\"$state\",\"width\":100,\"align\":\"center\",\"headerVertical\":\"flip\"},{\"title\":\"last-ready\",\"field\":\"lastSeenreadyFormatted\",\"width\":100,\"align\":\"left\",\"headerVertical\":\"flip\"},{\"title\":\"Homie\",\"field\":\"$homie\",\"width\":100,\"align\":\"left\",\"headerVertical\":\"flip\"},{\"title\":\"Platform\",\"field\":\"$implementation\",\"width\":100,\"align\":\"left\",\"headerVertical\":\"flip\"},{\"title\":\"Statistics\",\"columns\":[{\"title\":\"Interval\",\"field\":\"interval\",\"width\":100,\"headerVertical\":\"flip\"},{\"formatterParams\":{\"outputFormat\":\"d hh:mm:ss\",\"inputFormat\":\"seconds\",\"invalidPlaceholder\":\"(unknown)\"},\"title\":\"Uptime\",\"field\":\"uptime\",\"formatter\":\"function(cell, formatterParams, onRendered){     var pad = function (num) {         return (\\\"0\\\"+num).slice(-2);     };     var secs = Number(cell.getValue());     if (Number.isNaN(secs)) return;     var minutes = Math.floor(secs / 60);     secs = secs%60;     var hours = Math.floor(minutes/60);     minutes = minutes%60;     var days = Math.floor(hours/24);     hours = hours%24;     if (days>0)         return days+\\\"d \\\"+pad(hours)+\\\":\\\"+pad(minutes);     else         return pad(hours)+\\\":\\\"+pad(minutes)+\\\":\\\"+pad(secs); }\",\"width\":100,\"headerVertical\":\"flip\"},{\"formatterParams\":{\"min\":0,\"max\":100,\"color\":[\"red\",\"orange\",\"green\"],\"legend\":\"function (value) {if (value>0) return \\\"<span style='color:#FFFFFF;'>\\\"+value+\\\" %</span>\\\"; else return; }\",\"legendColor\":\"#FFFFFF\",\"legendAlign\":\"center\"},\"title\":\"Signal\",\"field\":\"signal\",\"formatter\":\"progress\",\"width\":100,\"headerVertical\":\"flip\"},{\"formatterParams\":{\"min\":2.5,\"max\":3.5,\"color\":[\"red\",\"green\",\"red\"],\"legend\":\"function (value) { if (value>0) return \\\"<span style='color:#FFFFFF;'>\\\"+value+\\\" V</span>\\\"; else return; }\",\"legendColor\":\"#101010\",\"legendAlign\":\"center\"},\"title\":\"Supply\",\"field\":\"supply\",\"formatter\":\"progress\",\"width\":100,\"headerVertical\":\"flip\"},{\"formatterParams\":{\"min\":0,\"max\":100,\"color\":[\"red\",\"orange\",\"green\"],\"legend\":\"function (value) {     if (value>0)         return \\\"<span style='color:#FFFFFF;'>\\\"+value+\\\" %</span>\\\";     else         return; }\",\"legendColor\":\"#101010\",\"legendAlign\":\"center\"},\"title\":\"Battery\",\"field\":\"battery\",\"formatter\":\"progress\",\"width\":100,\"headerVertical\":\"flip\"},{\"formatterParams\":{\"min\":0,\"max\":100000,\"color\":[\"red\",\"orange\",\"green\"],\"legend\":\"function (value) { if (value>0) return \\\"<span style='color:#FFFFFF;'>\\\"+(value/1024).toFixed(2)+\\\" kB</span>\\\"; else return; }\",\"legendColor\":\"#101010\",\"legendAlign\":\"center\"},\"title\":\"Memory\",\"field\":\"freeheap\",\"formatter\":\"progress\",\"width\":100,\"headerVertical\":\"flip\"},{\"formatterParams\":{\"target\":\"_blank\",\"min\":0,\"max\":100,\"color\":[\"red\",\"orange\",\"green\"],\"legend\":\"function (value) {     if (value>0)         return \\\"<span style='color:#FFFFFF;'>\\\"+value+\\\" %</span>\\\";     else         return; }\",\"legendColor\":\"#101010\",\"legendAlign\":\"center\"},\"title\":\"CPU load\",\"field\":\"cpuload\",\"formatter\":\"progress\",\"width\":100,\"headerVertical\":\"flip\"},{\"formatterParams\":{\"min\":20,\"max\":60,\"color\":[\"green\",\"orange\",\"red\"],\"legend\":\"function (value) { if (value>0) return \\\"<span style='color:#FFFFFF;'>\\\"+value+\\\" °C</span>\\\"; else return; }\",\"legendColor\":\"#101010\",\"legendAlign\":\"center\"},\"title\":\"CPU temp\",\"field\":\"cputemp\",\"formatter\":\"progress\",\"width\":100,\"headerVertical\":\"flip\"}]},{\"title\":\"Firmware\",\"columns\":[{\"formatter\":\"link\",\"formatterParams\":{\"labelField\":\"$localip\",\"urlPrefix\":\"http://\",\"target\":\"_blank\"},\"title\":\"IP\",\"field\":\"$localip\",\"width\":100},{\"title\":\"mac\",\"field\":\"$mac\",\"width\":100},{\"title\":\"Accsess Point\",\"field\":\"SSID\",\"width\":100},{\"title\":\"Firmware\",\"field\":\"name\",\"width\":100},{\"title\":\"Version\",\"field\":\"version\",\"width\":100},{\"title\":\"Last Boot Cause\",\"field\":\"lastBootCause\",\"width\":100},{\"title\":\"Reset Reason\",\"field\":\"resetReason\",\"width\":100}]}]},\"customHeight\":12}",
+                "ui": {
+                    "icon": "font-awesome/fa-table",
+                    "label": {
+                        "en-US": "Tabulator"
+                    },
+                    "type": "input",
+                    "opts": {
+                        "types": [
+                            "json",
+                            "env"
+                        ]
+                    }
+                }
+            },
+            {
+                "name": "tableDataProp",
+                "type": "str",
+                "value": "row",
+                "ui": {
+                    "icon": "font-awesome/fa-tag",
+                    "label": {
+                        "en-US": "rowProperty"
+                    },
+                    "type": "input",
+                    "opts": {
+                        "types": [
+                            "str",
+                            "num",
+                            "bool",
+                            "json",
+                            "bin",
+                            "env"
+                        ]
+                    }
+                }
+            },
+            {
+                "name": "tableIndex",
+                "type": "str",
+                "value": "$topic",
+                "ui": {
+                    "icon": "font-awesome/fa-indent",
+                    "label": {
+                        "en-US": "Index"
+                    },
+                    "type": "input",
+                    "opts": {
+                        "types": [
+                            "str",
+                            "json",
+                            "env"
+                        ]
+                    }
+                }
+            },
+            {
+                "name": "maxRows",
+                "type": "num",
+                "value": "0",
+                "ui": {
+                    "icon": "font-awesome/fa-list-ol",
+                    "type": "input",
+                    "opts": {
+                        "types": [
+                            "num",
+                            "bool",
+                            "env"
+                        ]
+                    },
+                    "label": {}
+                }
+            },
+            {
+                "name": "maxStore",
+                "type": "num",
+                "value": "0",
+                "ui": {
+                    "icon": "font-awesome/fa-database",
+                    "type": "input",
+                    "opts": {
+                        "types": [
+                            "num",
+                            "env"
+                        ]
+                    },
+                    "label": {}
+                }
+            },
+            {
+                "name": "dashboard",
+                "type": "str",
+                "value": "Remote Device Table",
+                "ui": {
+                    "icon": "font-awesome/fa-dashboard",
+                    "label": {
+                        "en-US": "Dashboard"
+                    },
+                    "type": "input",
+                    "opts": {
+                        "types": [
+                            "str",
+                            "env"
+                        ]
+                    }
+                }
+            },
+            {
+                "name": "tableContext",
+                "type": "json",
+                "value": "{\"tableData\":{\"name\":\"tableData\"},\"tableConfig\":{\"name\":\"tableConfig\",\"storage\":\"file\"},\"tableEdit\":{\"name\":\"tableEdit\",\"storage\":\"file\"}}",
+                "ui": {
+                    "icon": "font-awesome/fa-database",
+                    "label": {
+                        "en-US": "Context"
+                    },
+                    "type": "input",
+                    "opts": {
+                        "types": [
+                            "json",
+                            "env"
+                        ]
+                    }
+                }
+            }
+        ],
+        "color": "#3FADB5",
+        "icon": "node-red-dashboard/ui_slider.png",
+        "status": {
+            "x": 360,
+            "y": 34,
+            "wires": [
+                {
+                    "id": "5eb0bd6b.74b794",
+                    "port": 0
+                }
+            ]
+        }
+    },
+    {
+        "id": "5eb0bd6b.74b794",
+        "type": "function",
+        "z": "2924702c.b33a7",
+        "name": "handle tableData",
+        "func": "var status = {fill:\"red\",shape:\"dot\",text: \"payload \"};\nvar tableIndex = env.get(\"tableIndex\") || \"$topic\";\nvar tableDataProp = env.get(\"tableDataProp\") || \"row\";\nvar tableContext = env.get(\"tableContext\");\nvar dashboard = env.get(\"dashboard\");\nvar maxRows = env.get(\"maxRows\") || 0;\nvar maxStore = env.get(\"maxStore\") || 0;\n\nif (!tableContext.hasOwnProperty(\"tableData\") || !tableContext.hasOwnProperty(\"tableConfig\")) {\n    status.text=\"tableContext not defined\";\n    node.error(status.text);\n    return [{payload:status},null];\n}\n\n// context store to cache table data (memoryOnly prefered)\nvar tableData = flow.get(\"$parent.\"+tableContext.tableData.name,tableContext.tableData.storage);\nif (tableData===undefined) {\n    node.warn(\"[ui-table handler] tableData initialized!\");\n    tableData={};\n    flow.set(\"$parent.\"+tableContext.tableData.name,tableData,tableContext.tableData.storage);\n}\n\n// context Store to save table configuration (file)\nvar tableConfig = flow.get(\"$parent.\"+tableContext.tableConfig.name,tableContext.tableConfig.storage);\nif (tableConfig===undefined) {\n    node.warn(\"[ui-table handler] tableConfig initialized!\");\n    tableConfig={ResponsiveLayout:true};\n    flow.set(\"$parent.\"+tableContext.tableConfig.name,tableConfig,tableContext.tableConfig.storage);\n}\n\nif (tableConfig.hasOwnProperty(\"maxStore\")) maxStore=tableConfig.maxStore;\nif (tableConfig.hasOwnProperty(\"maxRows\")) maxRows=tableConfig.maxRows;\n\n// context Store to save table configuration (file)\nvar tableEdit;\nif (tableContext.hasOwnProperty(\"tableEdit\")) {\n    tableEdit = flow.get(\"$parent.\"+tableContext.tableEdit.name,tableContext.tableEdit.storage);\n    if (tableEdit===undefined) {\n        node.warn(\"[ui-table handler] tableEdit initialized!\");\n        tableEdit={};\n        flow.set(\"$parent.\"+tableContext.tableEdit.name,tableEdit,tableContext.tableEdit.storage);\n    }\n}\n\n// function to merge partial data into existing table row\nvar mergeObject = function (destination, source, filter) {\n    for (let currentSource in source) {\n        if (source.hasOwnProperty(currentSource)) {\n            if (filter!==undefined && tableEdit && tableEdit.hasOwnProperty(filter) && tableEdit[filter].hasOwnProperty(currentSource)) {\n                destination[currentSource]= tableEdit[filter][currentSource];\n                source[currentSource]=tableEdit[filter][currentSource];\n            } else {\n                destination[currentSource]= source[currentSource];\n            }\n        }    \n    }\n    return source;\n};\n    \n// deep search for a column\nvar searchTabulatorColumn = function (columns,key,match) {\n    var result;\n    for (let column of columns) {\n        if (column.hasOwnProperty(\"columns\")) {\n            result = searchTabulatorColumn(column.columns,key,match);\n            if (result!==undefined) return result;\n        } else if (column.hasOwnProperty(key) && column[key]===match) {\n            return column;\n        }\n    }\n};\n\n// command message to update add or update data on ui-table\nvar msgToTable={};\nmsgToTable.payload={\n    \"command\":msg.tabulatorCommand || \"updateOrAddData\",\n    \"arguments\": [],\n    \"returnPromise\": false\n};\n\n// store data in tableData\nif (msg.hasOwnProperty(tableDataProp)) {\n    // store data for later recover\n    if (!msg.hasOwnProperty(\"topic\")) { // check if index existst\n        status.text=\"msg.topic not defined!\";\n        return [{payload:status},null];\n    }\n    if (!tableData.hasOwnProperty(msg.topic)){ // first seen\n        if (maxRows>0 && Object.keys(tableData).lenght===0) {\n            tableConfig.currentFirstRow=msg.topic;\n        }\n        tableData[msg.topic]={};\n        if (tableEdit && tableEdit.hasOwnProperty(msg.topic)) { // table edits available!\n            Object.keys(tableEdit[msg.topic]).forEach((key) => {\n                msg[tableDataProp][key]=tableEdit[msg.topic][key];\n                tableData[msg.topic][key]=tableEdit[msg.topic][key];\n            })\n        }\n        if (maxStore>0 && typeof msg.topic === \"number\") { // limit rows in tableData\n            let rowKeys = Object.keys(tableData);\n            if (rowKeys.length>maxStore) {\n                for (let i=0; i<(rowKeys.length-maxStore); i++) {\n                    delete tableData[rowKeys[i]];\n                }\n            }\n        }\n    }\n    if (!tableData[msg.topic].hasOwnProperty(tableIndex)) tableData[msg.topic][tableIndex]=msg.topic;\n    msg[tableDataProp]=mergeObject(tableData[msg.topic],msg[tableDataProp],msg.topic);\n    msg[tableDataProp][tableIndex]=msg.topic;\n    msgToTable.payload.arguments=[[msg[tableDataProp]]];\n    // add aditional parameters\n    if (msg.hasOwnProperty(\"tabulatorParameter\") && Array.isArray(msg.tabulatorParameter)) {\n        for (let arg in msg.tabulatorParameter) msgToTable.payload.arguments.push(arg);\n    }\n    // delete rows if rows exceed maxRows\n    /*\n    if (maxRows>0 && tableConfig.hasOwnProperty(\"currentFirstRow\") && typeof tableData[msg.topic][tableIndex]===\"number\") {\n        //node.warn([maxRows,tableConfig.hasOwnProperty(\"currentFirstRow\"),typeof tableData[msg.topic][tableIndex],tableConfig.currentFirstRow,tableData[msg.topic][tableIndex]-maxRows])\n        if (tableConfig.currentFirstRow<tableData[msg.topic][tableIndex]-maxRows) {\n            node.warn([\"maxRowExeeded\",tableConfig.currentFirstRow]);\n            node.send([null,{payload:{\"command\":\"deleteRow\",\"arguments\": [tableConfig.currentFirstRow],\"returnPromise\": false}},null]);\n            tableConfig.currentFirstRow++;\n        }\n    }*/\n    if (maxRows>0 && typeof tableData[msg.topic][tableIndex]===\"number\" && msg.topic-maxRows>0) {\n        node.send([null,{payload:{\"command\":\"deleteRow\",\"arguments\": [msg.topic-maxRows],\"returnPromise\": false}},null]);\n    }\n    status.fill=\"green\";\n    status.text=msg.topic+\" updated\";\n    return [{payload:status},msgToTable,null];\n} if (msg.payload===\"connect\" || (msg.payload===\"change\" && msg.name===dashboard) || (msg.hasOwnProperty(\"payload\") && msg.payload.hasOwnProperty(\"command\"))) { \n    if (!msg.hasOwnProperty(\"ui_control\")) {\n        msg.ui_control = env.get('tabulator');\n        status.text+=\" ui_control added\";\n    }\n    //process commands\n    //node.warn({\"command\":msg.payload.command,\"msg\":msg,\"object\":msg.payload.object})\n    if (msg.payload.hasOwnProperty(\"command\") && msg.payload.command!=='getTable') {\n        status.fill=\"blue\";\n        switch(msg.payload.command) {\n            case 'deleteTable':\n                flow.set(\"$parent.\"+tableContext.tableData.name,undefined,tableContext.tableData.storage);\n                tableData={};\n                status.text=\"tabledata deleted\";\n                node.warn(\"[ui-table handler] \"+\"tabledata deleted\");\n                break;\n            case 'deleteRow':\n            case 'deleteDevice':\n                if (tableData.hasOwnProperty(msg.payload.object)) {\n                    delete tableData[msg.payload.object];\n                    status.text=msg.payload.object+\" deleted\";\n                } else {\n                    status.fill=\"yellow\";\n                    status.text=msg.payload.object+\" undefined\";\n                }\n                break;\n            case 'ignoreRow':\n            case 'ignoreDevice':\n                if (tableData.hasOwnProperty(msg.payload.object)) {\n                    delete tableData[msg.payload.object];\n                    status.text=msg.payload.object+\" will be ignored\";\n                    if (!tableConfig.hasOwnProperty('ignoreDevice')) tableConfig.ignoreDevice={};\n                    tableConfig.ignoreDevice[msg.payload.object]=true;\n                }\n                break;\n            case 'unIgnoreRow':\n            case 'unIgnoreDevice':\n                if (tableConfig.hasOwnProperty('ignoreDevice')) {\n                    delete tableConfig.ignoreDevice[msg.payload.object];\n                }\n                break;\n            case 'unIgnoreRows':\n            case 'unIgnoreDevices':\n                delete tableConfig.ignoreDevice;\n                break;\n            case 'updateData':\n                status.text=\"column \"+msg.payload.column+\" updated\";\n                delete msg.ui_control;\n                return [{payload:status},msg];\n            case 'updateTable':\n                status.text=msg.payload.command+\": \";\n                break;\n            case 'columnHide':\n                if (!tableConfig.hasOwnProperty('columnVisible')) tableConfig.columnVisible={};\n                tableConfig.columnVisible[msg.payload.object]=false;\n                break;\n            case 'columnUnHide':\n                if (!tableConfig.hasOwnProperty('columnVisible')) tableConfig.columnVisible={};\n                tableConfig.columnVisible[msg.payload.object]=true;\n                break;\n            case 'columnsUnHide':\n                for (let column in tableConfig.columnVisible) {\n                    if (tableConfig.columnVisible.hasOwnProperty(column)) tableConfig.columnVisible[column]=true;\n                }\n                break;\n            case 'refreshTable':\n                break;\n            case 'deleteColumnOrder':\n            case 'restoreColumnOrder':\n                delete tableConfig.columns;\n                break;\n            case 'deleteColumnWidth':\n            case 'resetColumnWidth':\n                delete tableConfig.columnWidths;\n                break;\n            case 'setResponsiveLayout':\n                tableConfig.ResponsiveLayout=!tableConfig.ResponsiveLayout;\n                break;\n            case 'deleteRowOrder':\n                delete tableConfig.rowOrder;\n                break;\n            case 'setMaxStore':\n                tableConfig.maxStore=msg.payload.object;\n                maxStore=msg.payload.object;\n                break;\n            case 'setMaxRows':\n                tableConfig.maxRows=msg.payload.object;\n                maxRows=msg.payload.object;\n                break;\n            default:\n                status.fill=\"red\";\n                status.text=\"unknown command \"+msg.payload.command;\n                node.warn(\"[ui-table handler] \"+status.text);\n                break;\n        }\n        flow.set(\"$parent.\"+tableContext.tableConfig.name,tableConfig,tableContext.tableConfig.storage);\n        node.send([{payload:status},null,null]);\n    }\n\n    // crawl through tabulator arrays and updated user defined values\n    var crawlTabulator = function (columns,match,config,property) {\n        for (let column of columns) {\n            if (column.hasOwnProperty(\"columns\")) {\n                crawlTabulator(column.columns,match,config,property);\n            } else if (config.hasOwnProperty(column[match])) column[property]=config[column.field];\n        }\n    };\n    \n    // restore custom column width\n    if (tableConfig.hasOwnProperty(\"columnWidths\") && msg.hasOwnProperty(\"ui_control\")) {\n        crawlTabulator(msg.ui_control.tabulator.columns,\"field\",tableConfig.columnWidths,\"width\");\n    }\n    \n    // restore custom column hide/show\n    if (tableConfig.hasOwnProperty(\"columnVisible\") && msg.hasOwnProperty(\"ui_control\")) {\n        crawlTabulator(msg.ui_control.tabulator.columns,\"field\",tableConfig.columnVisible,\"visible\");\n    }\n    \n    // restore custom responsive / standard view\n    if (tableConfig.hasOwnProperty(\"ResponsiveLayout\")) {\n        if (!tableConfig.ResponsiveLayout) {\n            msg.ui_control.tabulator.responsiveLayout=false;\n        }\n        msg.ui_control.tabulator.columns.forEach((column,index) => {\n            if (column.formatter===\"responsiveCollapse\") { // hide expand column on any position\n                column.visible=tableConfig.ResponsiveLayout;\n                return;\n            }\n        });\n    }\n\n    // sort columns\n    if (tableConfig.hasOwnProperty(\"columns\") && msg.hasOwnProperty(\"ui_control\") && msg.ui_control.hasOwnProperty(\"tabulator\")) {\n        var addedColumns = 0;\n        var sortColumnsByLayout = function (sortColumns, columnsLayout, targetColumns) {\n            for (var layoutColumn=0;  layoutColumn<columnsLayout.length; layoutColumn++) {\n                for (var sortColumn in sortColumns) {\n                    if (sortColumns[sortColumn].hasOwnProperty(\"columns\")) {\n                        targetColumns.push({\"title\":sortColumns[sortColumn].title, \"columns\":[]});\n                        sortColumnsByLayout(sortColumns[sortColumn].columns,columnsLayout,targetColumns[targetColumns.length-1].columns);\n                        layoutColumn=addedColumns; // jump forward after childes added\n                    } else {\n                        if (columnsLayout[layoutColumn].field===sortColumns[sortColumn].field){\n                            targetColumns.push(sortColumns[sortColumn]);\n                            addedColumns++;\n                            break;\n                        }\n                    }\n                }\n            }\n        };                 \n        var newColumns=[];\n        sortColumnsByLayout(msg.ui_control.tabulator.columns,tableConfig.columns,newColumns);\n        msg.ui_control.tabulator.columns=newColumns;\n    }\n\n    // restore stored lines after connect\n\n    let command = msg.payload.command;\n    var tableArray;\n    if (command===\"getTable\") {\n        msg.payload.tableArray=[];\n        tableArray=msg.payload.tableArray\n    } else {\n        msg.payload=[];\n        tableArray=msg.payload;\n    }\n    \n    var pushRowData = function(rowData) {\n        // ignore rows in ignoreRows array\n        if (tableConfig && tableConfig.hasOwnProperty(\"ignoreDevice\") && tableConfig.ignoreDevice[rowData]) {\n            // do nothing\n        } else {\n            // merge edits into table\n            if (tableEdit && tableEdit.hasOwnProperty(rowData)) {\n                let tableRow = RED.util.cloneMessage(tableData[rowData]);\n                Object.keys(tableEdit[rowData]).forEach((field) => {\n                    tableRow[field]=tableEdit[rowData][field];\n                });\n                tableArray.push(tableRow);\n            } else {\n                tableArray.push(tableData[rowData]);\n            }\n        }\n    }\n    \n    if (tableConfig.hasOwnProperty(\"rowOrder\")) {\n        // first check if new rows exits which are not in rowOrder\n        Object.keys(tableData).forEach((key) => {\n            if (tableConfig.rowOrder.indexOf(tableData[key][tableIndex])<0) {\n                tableConfig.rowOrder.push(tableData[key][tableIndex]); // add row to the end of rowOrder\n            }\n        });\n        tableConfig.rowOrder.forEach((value,index) => {\n            node.warn([\"pushRowOrder\",value,tableData.hasOwnProperty(value),tableData[value]]);\n            if (tableData.hasOwnProperty(value)) { // push rows in rowOrder sequence\n                pushRowData(value);\n            } else { // delete not existing rows from rowOrder\n                tableConfig.rowOrder.splice(index,1)\n            }\n       });\n    } else {\n        for (let rowData in tableData) {\n            pushRowData(rowData);\n        }\n    }\n    // store the first index if maxRows limits amount of displayed lines\n    if (maxRows>0 && tableData) {\n        let tableKeys=Object.keys(tableData);\n        if (tableKeys.length>0 && typeof tableData[tableKeys[0]][tableIndex] === \"number\") {\n            tableConfig.currentFirstRow=tableData[tableKeys[0]][tableIndex];\n        }\n    }\n    \n    if (command=='getTable'){\n        status.fill=\"blue\";\n        status.text+=\" \"+tableArray.length+\" rows emitted\";\n        return [{payload:status},null,msg];\n    } else {\n        status.fill=\"blue\";\n        status.text+=\" \"+tableArray.length+\" rows restored\";\n        return [{payload:status},msg,[{topic:\"maxRows\",payload:maxRows},{topic:\"maxStore\",payload:maxStore}]];\n    }\n} if (msg.hasOwnProperty(\"ui_control\")) {\n    // callback from tabulator\n    status.fill=\"blue\";\n    status.text=\"callback \"+msg.ui_control.callback;\n    switch(msg.ui_control.callback) {\n        case \"columnResized\": // save new column width\n            if (tableConfig.columnWidths===undefined) tableConfig.columnWidths={};\n            tableConfig.columnWidths[msg.ui_control.columnWidths.field]=msg.ui_control.columnWidths.width;\n            flow.set(\"$parent.\"+tableContext.tableConfig.name,tableConfig,tableContext.tableConfig.storage);\n            status.text=msg.ui_control.columnWidths.field+\"=\"+msg.ui_control.columnWidths.width+\"px\";\n            break;\n        case \"columnMoved\": // save new column order\n            if (tableConfig.columns===undefined) tableConfig.columns=[];\n            tableConfig.columns=msg.ui_control.columns;\n            flow.set(\"$parent.\"+tableContext.tableConfig.name,tableConfig,tableContext.tableConfig.storage);\n            status.text=\"new column order\";\n            break;\n        case \"cellEdited\":\n            if (tableEdit) {\n                if (!tableEdit.hasOwnProperty(msg[tableIndex])) tableEdit[msg[tableIndex]]={};\n                tableEdit[msg[tableIndex]][msg.field] = msg.payload; // save data and mark as edited field\n                flow.set(\"$parent.\"+tableContext.tableEdit.name,tableEdit,tableContext.tableEdit.storage);\n                tableData[msg[tableIndex]][msg.field] = msg.payload; // overwrite tableData with edit\n                flow.set(\"$parent.\"+tableContext.tableData.name,tableData,tableContext.tableData.storage);\n                status.text=msg[tableIndex]+\" \"+msg.field+\" edited to \"+msg.payload;\n                msg[tableDataProp]={};\n                msg[tableDataProp][tableIndex]=msg[tableIndex];\n                msg[tableDataProp][msg.field]=msg.payload;\n                msgToTable.payload.arguments=[[msg[tableDataProp]]];\n                node.send([{payload:status},msgToTable,msg]);\n            } else {\n                node.error(\"[ui-table handler] no tableEdit store defined!\")\n            }\n            break;\n        case \"rowContext\":\n            msg.ignoredDevices=[];\n            for (let rowData in tableConfig.ignoreDevice) {\n                if (tableConfig.ignoreDevice.hasOwnProperty(rowData)) {\n                    msg.ignoredDevices.push({\"text\":rowData,\"icon\":\"fa fa-plug\",\"topic\":\"unIgnoreDevice\",\"payload\":rowData})  \n                }\n            }\n            break;\n        case \"headerContext\":\n            msg.hiddenColumns=[];\n            let tabulatorConfig = env.get('tabulator');\n            for (let column in tableConfig.columnVisible) {\n                if (tableConfig.columnVisible.hasOwnProperty(column) &&\n                    !tableConfig.columnVisible[column]) {\n                    let configColumn=searchTabulatorColumn(tabulatorConfig.tabulator.columns,\"field\",column);\n                    let icon;\n                    if (configColumn.hasOwnProperty('title') && configColumn.title.toLowerCase().includes('</i>')) {\n                        // <i class='fa fa-star-half-o'></i> State\n                        let start=configColumn.title.indexOf(\"'fa \");\n                        let end=configColumn.title.indexOf(\"'\",start+1);\n                        icon=configColumn.title.substring(start+4,end);\n                    }\n                    msg.hiddenColumns.push({\"text\":column,\"icon\":icon,\"topic\":\"columnUnHide\",\"payload\":configColumn.field})  \n                }\n            }\n            break;\n        case \"rowMoved\":\n            if (tableConfig.rowOrder===undefined) tableConfig.rowOrder={};\n            tableConfig.rowOrder=msg.ui_control.rowOrder;\n            flow.set(\"$parent.\"+tableContext.tableConfig.name,tableConfig,tableContext.tableConfig.storage);\n            status.text=\"new row order\";\n            break;\n        default:\n            // if rowIndex exists pass complete object\n            if (msg.hasOwnProperty(tableIndex)) {\n                msg.rowData=tableData[msg[tableIndex]];\n            }\n            status.text=\"pass message\";\n    }\n    return [{payload:status},null,msg];\n} if (Array.isArray(msg.payload)) {\n    tableData={};\n    msg.payload.forEach((row) => {\n        if (row.hasOwnProperty(tableIndex)) {\n            tableData[row[tableIndex]]=row;\n        }\n    });\n    flow.set(\"$parent.\"+tableContext.tableData.name,tableData,tableContext.tableData.storage);\n    if (tableContext.hasOwnProperty(\"tableEdit\")) {\n        tableEdit={};\n        flow.set(\"$parent.\"+tableContext.tableEdit.name,tableEdit,tableContext.tableEdit.storage);\n    }\n    status.fill=\"blue\"\n    status.text=\"table replaced \"+msg.payload.length+\" rows\";\n    return [{payload:status},msg,null];\n}    \n    \n// nothing to do bejond this point\nstatus.text+=\" [\"+msg.payload+\"]\";\nreturn [{payload:status},null];\n",
+        "outputs": 3,
+        "noerr": 0,
+        "x": 192,
+        "y": 85,
+        "wires": [
+            [],
+            [],
+            []
+        ],
+        "icon": "font-awesome/fa-table"
+    },
+    {
+        "id": "a7b351fc.2c5a",
+        "type": "ui_table",
+        "z": "6a99f950.207c08",
+        "group": "88070f1c.adb71",
+        "name": "",
+        "order": 7,
+        "width": "24",
+        "height": "6",
+        "columns": [],
+        "outputs": 1,
+        "cts": true,
+        "x": 679,
+        "y": 1309,
+        "wires": [
+            [
+                "fa9ca.5021f6368"
+            ]
+        ]
+    },
+    {
+        "id": "d64bc084.e4e4a",
+        "type": "ui_ui_control",
+        "z": "6a99f950.207c08",
+        "name": "",
+        "events": "all",
+        "x": 162,
+        "y": 1360,
+        "wires": [
+            [
+                "ae1ca437.304d58"
+            ]
+        ]
+    },
+    {
+        "id": "9a07e0ea.29632",
+        "type": "homie-convention-device",
+        "z": "6a99f950.207c08",
+        "broker": "6bb8f98.7e5f308",
+        "name": "",
+        "deviceID": "[any]",
+        "nodeID": "[any]",
+        "propertyID": "[any]",
+        "topic": "[any]/[any]/[any]",
+        "infoAttributes": true,
+        "infoTiming": true,
+        "infoError": true,
+        "addLabel": "none",
+        "labelTopic": false,
+        "labelPayload": true,
+        "labelName": "",
+        "uiPlaceName": "",
+        "uiNode": "none",
+        "uiControlDropdown": true,
+        "uiControlMinMax": true,
+        "uiColor1": "#ffffff",
+        "uiBgColor1": "#ffffff",
+        "uiColorON": "#ffffff",
+        "uiColorOFF": "#ffffff",
+        "uiColorPredicted": "#ffffff",
+        "uiUseColorPredicted": false,
+        "uiColorPredictedOff": "#ffffff",
+        "uiUseColorPredictedOff": false,
+        "uiFormat": false,
+        "uiTooltip": "",
+        "uiIcon1": "",
+        "uiIconON": "",
+        "uiIconOFF": "",
+        "uiSwitchPredicted": false,
+        "uiSwitchColorPredictedON": "#aaaaaa",
+        "uiSwitchColorPredictedOFF": "#aaaaaa",
+        "uiSwitchIconPredictedON": "fa-toggle-on",
+        "uiSwitchIconPredictedOFF": "fa-toggle-off",
+        "uiFormatColor": "homieString",
+        "settable": false,
+        "x": 182,
+        "y": 612,
+        "wires": [
+            [
+                "630ed383.e5f23c"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "630ed383.e5f23c",
+        "type": "function",
+        "z": "6a99f950.207c08",
+        "name": "translate homie",
+        "func": "msg.topic='mqtt://broker.hivemq.com:1883/healthy-indoors-project/'+msg.deviceId;\nmsg.state={};\nmsg.state[msg.propertyName]=msg.value;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 437,
+        "y": 595,
+        "wires": [
+            [
+                "2b297179.f6edde",
+                "4eb5d2d8.ecd7ac"
+            ]
+        ],
+        "icon": "node-red/swap.svg"
+    },
+    {
+        "id": "fa9ca.5021f6368",
+        "type": "switch",
+        "z": "6a99f950.207c08",
+        "name": "filter callbacks",
+        "property": "$exists(ui_control)",
+        "propertyType": "jsonata",
+        "rules": [
+            {
+                "t": "false"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 845,
+        "y": 1309,
+        "wires": [
+            [
+                "924005b6.47cf78"
+            ],
+            [
+                "961e8359.3a95b",
+                "b0fed137.a74e7"
+            ]
+        ]
+    },
+    {
+        "id": "d51a172e.3d9828",
+        "type": "link out",
+        "z": "6a99f950.207c08",
+        "name": "toTable",
+        "links": [
+            "98d9fcf3.9980e",
+            "7d2b1b0d.058af4"
+        ],
+        "x": 525,
+        "y": 1207,
+        "wires": []
+    },
+    {
+        "id": "98d9fcf3.9980e",
+        "type": "link in",
+        "z": "6a99f950.207c08",
+        "name": "Table",
+        "links": [
+            "d51a172e.3d9828",
+            "c7c4ccfa.7acd8",
+            "4a472551.adc9cc"
+        ],
+        "x": 304,
+        "y": 1411,
+        "wires": [
+            [
+                "961e8359.3a95b"
+            ]
+        ]
+    },
+    {
+        "id": "961e8359.3a95b",
+        "type": "subflow:2924702c.b33a7",
+        "z": "6a99f950.207c08",
+        "name": "",
+        "env": [
+            {
+                "name": "tabulator",
+                "value": "{\"customHeight\":18,\"tabulator\":{\"responsiveLayout\":\"collapse\",\"responsiveLayoutCollapseStartOpen\":false,\"index\":\"$topic\",\"layout\":\"fitColumns\",\"movableColumns\":true,\"resizableColumns\":true,\"groupBy\":\"\",\"columns\":[{\"formatter\":\"responsiveCollapse\",\"width\":30,\"minWidth\":30,\"align\":\"center\",\"resizable\":false,\"headerSort\":false,\"frozen\":true,\"title\":\"Expand&nbsp;&nbsp;<i class='fa fa-plus-circle'></i> \",\"field\":\"expand\",\"headerVertical\":\"flip\",\"headerTooltip\":\"click to expand more details\",\"headerContext\":\"function(e,column){ this.send({ui_control:{callback:'headerContext'},position:{\\\"x\\\":e.x,\\\"y\\\":e.y},payload:column._column.field}); e.preventDefault(); }\"},{\"formatter\":\"function(cell, formatterParams, onRendered) {      var html = cell.getValue(); return html;  }\",\"title\":\"State&nbsp;&nbsp;<i class='fa fa-bolt fa-rotate-90'></i>\",\"field\":\"$stateIcon\",\"width\":40,\"align\":\"center\",\"frozen\":true,\"headerVertical\":\"flip\",\"headerTooltip\":\"current state as icon: init, ready, lost, sleeping, disconnected or alert\",\"headerContext\":\"function(e,column){ this.send({ui_control:{callback:'headerContext'},position:{\\\"x\\\":e.x,\\\"y\\\":e.y},payload:column._column.field}); e.preventDefault(); }\"},{\"formatter\":\"function(cell, formatterParams, onRendered) {     var html = cell.getValue(); return html;  }\",\"title\":\"Signal&nbsp;&nbsp;<i class='fa fa-signal fa-rotate-90'></i>\",\"field\":\"signalIcon\",\"width\":40,\"align\":\"center\",\"frozen\":true,\"headerVertical\":\"flip\",\"headerTooltip\":\"signal quality for wireless devices (signalIcon)\",\"headerContext\":\"function(e,column){ this.send({ui_control:{callback:'headerContext'},position:{\\\"x\\\":e.x,\\\"y\\\":e.y},payload:column._column.field}); e.preventDefault(); }\"},{\"title\":\"Name&nbsp;&nbsp;<i class='fa fa-tag fa-rotate-90'></i>\",\"field\":\"$name\",\"width\":140,\"frozen\":true,\"tooltip\":true,\"headerVertical\":\"\",\"headerTooltip\":\"name of the device ($name)\",\"editor\":\"input\",\"headerContext\":\"function(e,column){ this.send({ui_control:{callback:'headerContextNoHide'},position:{\\\"x\\\":e.x,\\\"y\\\":e.y},payload:column._column.field}); e.preventDefault(); }\"},{\"title\":\"Location&nbsp;&nbsp;<i class='fa fa-map-marker'></i>\",\"field\":\"room\",\"width\":100,\"headerTooltip\":\"location of the device (room)\",\"tooltip\":true,\"editor\":\"autocomplete\",\"editorParams\":{\"freetext\":true,\"allowEmpty\":true,\"showListOnEmpty\":true,\"values\":true},\"headerVertical\":\"\",\"headerContext\":\"function(e,column){ this.send({ui_control:{callback:'headerContext'},position:{\\\"x\\\":e.x,\\\"y\\\":e.y},payload:column._column.field}); e.preventDefault(); }\"},{\"formatterParams\":{\"min\":0,\"max\":500,\"color\":\"function (value) {     if (value<51) return \\\"#00e600\\\";     if (value<101) return \\\"#8cff1a\\\";     if (value<151) return \\\"#ffff66\\\";     if (value<201) return \\\"#ffbf00\\\";     if (value<251) return \\\"#e60000\\\";     if (value<351) return \\\"#cc0099\\\";     return \\\"#993333\\\"; }\",\"legend\":\"function (value) {if (value>0) return \\\"<span style='color:#FFFFFF;'>\\\"+value+\\\"</span>\\\"; else return; }\",\"legendColor\":\"#FFFFFF\",\"legendAlign\":\"center\"},\"formatter\":\"progress\",\"title\":\"indoor air quality&nbsp;&nbsp;<i class='fa fa-circle-o-notch '></i>\",\"field\":\"iaq\",\"width\":40,\"headerVertical\":\"\",\"headerContext\":\"function(e,column){ this.send({ui_control:{callback:'headerContext'},position:{\\\"x\\\":e.x,\\\"y\\\":e.y},payload:column._column.field}); e.preventDefault(); }\"},{\"title\":\"static IAQ&nbsp;&nbsp;<i class='fa fa-circle-o-notch '></i>\",\"field\":\"staticIaq\",\"width\":40,\"headerVertical\":\"\",\"headerTooltip\":\"iaq for static devices\",\"headerContext\":\"function(e,column){ this.send({ui_control:{callback:'headerContext'},position:{\\\"x\\\":e.x,\\\"y\\\":e.y},payload:column._column.field}); e.preventDefault(); }\"},{\"formatter\":\"function(cell, formatterParams, onRendered){     return cell.getValue().toFixed(2)+\\\" ppm\\\" }\",\"title\":\"CO2&nbsp;&nbsp;<i class='fa fa-circle-o-notch '></i>\",\"field\":\"co2Equivalent\",\"width\":40,\"headerVertical\":\"\",\"headerTooltip\":\"calculated co2 ammount ppm\",\"headerContext\":\"function(e,column){ this.send({ui_control:{callback:'headerContext'},position:{\\\"x\\\":e.x,\\\"y\\\":e.y},payload:column._column.field}); e.preventDefault(); }\"},{\"title\":\"breath VOC&nbsp;&nbsp;<i class='fa fa-circle-o-notch '></i>\",\"field\":\"breathVocEquivalent\",\"width\":40,\"headerVertical\":\"flip\",\"headerTooltip\":\"calculated breath VOC\",\"headerContext\":\"function(e,column){ this.send({ui_control:{callback:'headerContext'},position:{\\\"x\\\":e.x,\\\"y\\\":e.y},payload:column._column.field}); e.preventDefault(); }\"},{\"title\":\"gas resistance&nbsp;&nbsp;<i class='fa fa-circle-o-notch '></i>\",\"field\":\"gasResistance\",\"width\":40,\"headerVertical\":\"flip\",\"headerTooltip\":\"raw sensor reading\",\"headerContext\":\"function(e,column){ this.send({ui_control:{callback:'headerContext'},position:{\\\"x\\\":e.x,\\\"y\\\":e.y},payload:column._column.field}); e.preventDefault(); }\"},{\"formatter\":\"function(cell, formatterParams, onRendered){     var data = cell.getValue();     switch (data) {         case 0:             cell.getElement().style.backgroundColor = \\\"#c68e39\\\";                          cell.getElement().style.color = \\\"\\\";                          return \\\"started\\\";                  case 1:             cell.getElement().style.backgroundColor = \\\"#b34d91\\\";                          cell.getElement().style.color = \\\"\\\";                          return \\\"unshure\\\";                  case 2:                   cell.getElement().style.backgroundColor = \\\"#009999\\\";                          cell.getElement().style.color = \\\"\\\";                          return \\\"calibrating\\\";         case 3:             cell.getElement().style.backgroundColor = \\\"#339966\\\";                          cell.getElement().style.color = \\\"\\\";                          return \\\"calibrated\\\";     } }\",\"title\":\"accuracy&nbsp;&nbsp;<i class='fa fa-circle-o-notch '></i>\",\"field\":\"accuracy\",\"width\":40,\"headerVertical\":\"flip\",\"headerTooltip\":\"sensor status\",\"headerContext\":\"function(e,column){ this.send({ui_control:{callback:'headerContext'},position:{\\\"x\\\":e.x,\\\"y\\\":e.y},payload:column._column.field}); e.preventDefault(); }\"},{\"formatter\":\"function(cell, formatterParams, onRendered){     return cell.getValue().toFixed(2)+\\\" °C\\\" }\",\"title\":\"Temperature&nbsp;&nbsp;<i class='fa fa-thermometer-half'></i>\",\"field\":\"temperature\",\"width\":40,\"headerVertical\":\"flip\",\"headerContext\":\"function(e,column){ this.send({ui_control:{callback:'headerContext'},position:{\\\"x\\\":e.x,\\\"y\\\":e.y},payload:column._column.field}); e.preventDefault(); }\"},{\"formatter\":\"function(cell, formatterParams, onRendered){     return cell.getValue().toFixed(2)+\\\" %\\\" }\",\"title\":\"Humidity&nbsp;&nbsp;<i class='fa fa-tint'></i>\",\"field\":\"humidity\",\"width\":40,\"headerVertical\":\"flip\",\"headerContext\":\"function(e,column){ this.send({ui_control:{callback:'headerContext'},position:{\\\"x\\\":e.x,\\\"y\\\":e.y},payload:column._column.field}); e.preventDefault(); }\"},{\"formatter\":\"function(cell, formatterParams, onRendered){     return cell.getValue().toFixed(0)+\\\" hPa\\\" }\",\"title\":\"Air Pressure&nbsp;&nbsp;<i class='fa fa-arrow-down'></i>\",\"field\":\"pressure\",\"width\":40,\"headerVertical\":\"flip\",\"headerContext\":\"function(e,column){ this.send({ui_control:{callback:'headerContext'},position:{\\\"x\\\":e.x,\\\"y\\\":e.y},payload:column._column.field}); e.preventDefault(); }\"},{\"title\":\"State&nbsp;&nbsp;<i class='fa fa-star-half-o'></i> \",\"field\":\"$state\",\"width\":65,\"align\":\"center\",\"headerVertical\":\"flip\",\"headerTooltip\":\"current state: init, ready, lost, sleeping, disconnected or alert\",\"headerContext\":\"function(e,column){ this.send({ui_control:{callback:'headerContext'},position:{\\\"x\\\":e.x,\\\"y\\\":e.y},payload:column._column.field}); e.preventDefault(); }\"},{\"title\":\"last seen&nbsp;&nbsp;<i class='fa fa-clock-o fa-rotate-90'></i>\",\"field\":\"lastSeenreadyFormatted\",\"width\":80,\"align\":\"right\",\"tooltip\":true,\"headerVertical\":\"flip\",\"headerTooltip\":\"time since the device was sending $state updates\",\"headerContext\":\"function(e,column){ this.send({ui_control:{callback:'headerContext'},position:{\\\"x\\\":e.x,\\\"y\\\":e.y},payload:column._column.field}); e.preventDefault(); }\"},{\"title\":\"interval&nbsp;&nbsp;<i class='fa fa-undo'></i>\",\"field\":\"interval\",\"width\":40,\"headerVertical\":\"flip\",\"headerTooltip\":\"device update interval\",\"headerContext\":\"function(e,column){ this.send({ui_control:{callback:'headerContext'},position:{\\\"x\\\":e.x,\\\"y\\\":e.y},payload:column._column.field}); e.preventDefault(); }\"},{\"formatterParams\":{\"outputFormat\":\"d hh:mm:ss\",\"inputFormat\":\"seconds\",\"invalidPlaceholder\":\"(unknown)\"},\"title\":\"uptime&nbsp;&nbsp;<i class='fa fa-clock-o'></i>\",\"field\":\"uptime\",\"formatter\":\"function(cell, formatterParams, onRendered){     var pad = function (num) {         return (\\\"0\\\"+num).slice(-2);     };     var secs = Number(cell.getValue());     if (Number.isNaN(secs)) return;     var minutes = Math.floor(secs / 60);     secs = secs%60;     var hours = Math.floor(minutes/60);     minutes = minutes%60;     var days = Math.floor(hours/24);     hours = hours%24;     if (days>0)         return days+\\\"d \\\"+pad(hours)+\\\":\\\"+pad(minutes);     else         return pad(hours)+\\\":\\\"+pad(minutes)+\\\":\\\"+pad(secs); }\",\"width\":75,\"headerVertical\":\"flip\",\"headerTooltip\":\"device uptime\",\"headerContext\":\"function(e,column){ this.send({ui_control:{callback:'headerContext'},position:{\\\"x\\\":e.x,\\\"y\\\":e.y},payload:column._column.field}); e.preventDefault(); }\"},{\"formatterParams\":{\"min\":0,\"max\":100,\"color\":[\"red\",\"orange\",\"green\"],\"legend\":\"function (value) {if (value>0) return \\\"<span style='color:#FFFFFF;'>\\\"+value+\\\" %</span>\\\"; else return; }\",\"legendColor\":\"#FFFFFF\",\"legendAlign\":\"center\"},\"title\":\"signal&nbsp;&nbsp;<i class='fa fa-wifi'></i>\",\"field\":\"signal\",\"formatter\":\"progress\",\"width\":70,\"headerVertical\":\"flip\",\"headerTooltip\":\"device wireless signal quality\",\"headerContext\":\"function(e,column){ this.send({ui_control:{callback:'headerContext'},position:{\\\"x\\\":e.x,\\\"y\\\":e.y},payload:column._column.field}); e.preventDefault(); }\"},{\"formatterParams\":{\"min\":2.5,\"max\":3.5,\"color\":[\"red\",\"green\",\"red\"],\"legend\":\"function (value) { if (value>0) return \\\"<span style='color:#FFFFFF;'>\\\"+value+\\\" V</span>\\\"; else return; }\",\"legendColor\":\"#101010\",\"legendAlign\":\"center\"},\"title\":\"supply&nbsp;&nbsp;<i class='fa fa-plug'></i>\",\"field\":\"supply\",\"formatter\":\"progress\",\"width\":70,\"headerVertical\":\"flip\",\"headerTooltip\":\"device supply voltage\",\"headerContext\":\"function(e,column){ this.send({ui_control:{callback:'headerContext'},position:{\\\"x\\\":e.x,\\\"y\\\":e.y},payload:column._column.field}); e.preventDefault(); }\"},{\"formatterParams\":{\"min\":0,\"max\":100,\"color\":[\"red\",\"orange\",\"green\"],\"legend\":\"function (value) {     if (value>0)         return \\\"<span style='color:#FFFFFF;'>\\\"+value+\\\" %</span>\\\";     else         return; }\",\"legendColor\":\"#101010\",\"legendAlign\":\"center\"},\"title\":\"battery&nbsp;&nbsp;<i class='fa fa-battery-2'></i>\",\"field\":\"battery\",\"formatter\":\"progress\",\"width\":70,\"headerVertical\":\"flip\",\"headerTooltip\":\"device battery level in %\",\"headerContext\":\"function(e,column){ this.send({ui_control:{callback:'headerContext'},position:{\\\"x\\\":e.x,\\\"y\\\":e.y},payload:column._column.field}); e.preventDefault(); }\"},{\"formatterParams\":{\"min\":0,\"max\":100,\"color\":[\"red\",\"orange\",\"green\"],\"legend\":\"function (value) {     if (value>0)         return \\\"<span style='color:#FFFFFF;'>\\\"+value+\\\" %</span>\\\";     else         return; }\",\"legendColor\":\"#101010\",\"legendAlign\":\"right\"},\"title\":\"load&nbsp;&nbsp;<i class='fa fa-tasks'></i>\",\"field\":\"cpuload\",\"formatter\":\"progress\",\"width\":70,\"headerVertical\":\"flip\",\"headerTooltip\":\"device cpu load in %\",\"headerContext\":\"function(e,column){ this.send({ui_control:{callback:'headerContext'},position:{\\\"x\\\":e.x,\\\"y\\\":e.y},payload:column._column.field}); e.preventDefault(); }\"},{\"formatterParams\":{\"min\":20,\"max\":60,\"color\":[\"green\",\"orange\",\"red\"],\"legend\":\"function (value) { if (value>0) return \\\"<span style='color:#FFFFFF;'>\\\"+value+\\\" °C</span>\\\"; else return; }\",\"legendColor\":\"#101010\",\"legendAlign\":\"right\"},\"title\":\"temp&nbsp;&nbsp;<i class='fa fa-thermometer-half'></i>\",\"field\":\"cputemp\",\"formatter\":\"progress\",\"width\":70,\"headerVertical\":\"flip\",\"headerTooltip\":\"device cpu temperature in °C\",\"headerContext\":\"function(e,column){ this.send({ui_control:{callback:'headerContext'},position:{\\\"x\\\":e.x,\\\"y\\\":e.y},payload:column._column.field}); e.preventDefault(); }\"},{\"formatter\":\"link\",\"formatterParams\":{\"labelField\":\"$localip\",\"urlPrefix\":\"http://\",\"target\":\"_blank\"},\"title\":\"ip&nbsp;&nbsp;<i class='fa fa-globe'></i>\",\"field\":\"$localip\",\"width\":100,\"headerVertical\":\"flip\",\"headerTooltip\":\"device local IP-Address ($localip)\",\"headerContext\":\"function(e,column){ this.send({ui_control:{callback:'headerContext'},position:{\\\"x\\\":e.x,\\\"y\\\":e.y},payload:column._column.field}); e.preventDefault(); }\"},{\"title\":\"mac&nbsp;&nbsp;<i class='fa fa-barcode'></i>\",\"field\":\"$mac\",\"width\":100,\"headerVertical\":\"flip\",\"headerTooltip\":\"device mac address ($mac)\",\"headerContext\":\"function(e,column){ this.send({ui_control:{callback:'headerContext'},position:{\\\"x\\\":e.x,\\\"y\\\":e.y},payload:column._column.field}); e.preventDefault(); }\"},{\"title\":\"firmware&nbsp;&nbsp;<i class='fa fa-code'></i>\",\"field\":\"name\",\"width\":100,\"headerVertical\":\"flip\",\"headerTooltip\":\"name of the firmware ($fw/name)\",\"headerContext\":\"function(e,column){ this.send({ui_control:{callback:'headerContext'},position:{\\\"x\\\":e.x,\\\"y\\\":e.y},payload:column._column.field}); e.preventDefault(); }\"},{\"title\":\"version&nbsp;&nbsp;<i class='fa fa-code-fork'></i>\",\"field\":\"version\",\"width\":100,\"headerVertical\":\"flip\",\"headerTooltip\":\"version of the firmware ($fw/version)\",\"headerContext\":\"function(e,column){ this.send({ui_control:{callback:'headerContext'},position:{\\\"x\\\":e.x,\\\"y\\\":e.y},payload:column._column.field}); e.preventDefault(); }\"},{\"title\":\"homie&nbsp;&nbsp;<i class='fa fa-rss-square'></i>\",\"field\":\"$homie\",\"width\":100,\"align\":\"left\",\"headerVertical\":\"flip\",\"headerTooltip\":\"homie version ($version)\",\"headerContext\":\"function(e,column){ this.send({ui_control:{callback:'headerContext'},position:{\\\"x\\\":e.x,\\\"y\\\":e.y},payload:column._column.field}); e.preventDefault(); }\"},{\"title\":\"platform&nbsp;&nbsp;<i class='fa fa-microchip'></i>\",\"field\":\"$implementation\",\"width\":100,\"align\":\"left\",\"headerVertical\":\"flip\",\"headerTooltip\":\"name of the platform ($implementation)\",\"tooltip\":true,\"headerContext\":\"function(e,column){ this.send({ui_control:{callback:'headerContext'},position:{\\\"x\\\":e.x,\\\"y\\\":e.y},payload:column._column.field}); e.preventDefault(); }\"}],\"columnResized\":\"function(column){     var newColumn = {         field: column._column.field,         visible: column._column.visible,         width: column._column.width,         widthFixed: column._column.widthFixed,         widthStyled: column._column.widthStyled     }; this.send({topic:this.config.topic,ui_control:{callback:'columnResized',columnWidths:newColumn}}); }\",\"columnMoved\":\"function(column, columns){     var newColumns=[];     columns.forEach(function (column) {         newColumns.push({'field': column._column.definition.field, 'title': column._column.definition.title});     });     this.send({topic:this.config.topic,ui_control:{callback:'columnMoved',columns:newColumns}}); }\",\"rowFormatter\":\"function(row){     var data = row.getData();     switch (data.$state) {         case \\\"lost\\\":             row.getElement().style.backgroundColor = \\\"#9e2e66\\\";             row.getElement().style.color = \\\"#a6a6a6\\\";             break;         case \\\"sleeping\\\":             row.getElement().style.backgroundColor = \\\"#336699\\\";             break;         case \\\"disconnected\\\":             row.getElement().style.backgroundColor = \\\"#cc3300\\\";             row.getElement().style.color = \\\"#a6a6a6\\\";             break;         case \\\"alert\\\":             row.getElement().style.backgroundColor = \\\"#A6A6DF\\\";             break;         case \\\"init\\\":             row.getElement().style.backgroundColor = \\\"#f2f20d\\\";             break;         case \\\"ready\\\":             row.getElement().style.backgroundColor = \\\"\\\";             row.getElement().style.color = \\\"\\\";             break;         } }\",\"rowContext\":\"function(e, row){     this.send({ui_control:{callback:'rowContext'},position:{\\\"x\\\":e.x,\\\"y\\\":e.y},payload:{\\\"$name\\\":row._row.data.$name,\\\"$localip\\\":row._row.data.$localip,\\\"name\\\":row._row.data.name},\\\"topic\\\":row._row.data.$topic});     e.preventDefault(); }\",\"cellEdited\":\"function(cell){     this.send({ui_control:{callback:'cellEdited'},         payload:cell._cell.value,         \\\"oldValue\\\":cell._cell.oldValue,         \\\"field\\\":cell._cell.column.field,         \\\"$topic\\\":cell._cell.row.data.$topic}); }\"}}",
+                "type": "json"
+            },
+            {
+                "name": "tableDataProp",
+                "value": "state",
+                "type": "str"
+            },
+            {
+                "name": "dashboard",
+                "value": "Healthy Indoors Project",
+                "type": "str"
+            }
+        ],
+        "x": 476,
+        "y": 1394,
+        "wires": [
+            [
+                "a7b351fc.2c5a",
+                "a211471f.4ec008"
+            ],
+            [
+                "b6c50a05.4d4858"
+            ]
+        ]
+    },
+    {
+        "id": "befa92d0.11e9",
+        "type": "switch",
+        "z": "6a99f950.207c08",
+        "name": "callback",
+        "property": "ui_control.callback",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "rowContext",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "headerContext",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "cellEdited",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "columnMoved",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "columnResized",
+                "vt": "str"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 5,
+        "x": 247,
+        "y": 1632,
+        "wires": [
+            [
+                "a8435ae1.3b10c8"
+            ],
+            [
+                "cc483143.c110f"
+            ],
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "5cc1cee8.eed47",
+        "type": "switch",
+        "z": "6a99f950.207c08",
+        "name": "",
+        "property": "payload.command",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "updateDevice",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "updateDevices",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "deleteDevice",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "ignoreDevice",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "unIgnoreDevice",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "refreshTable",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "deleteTable",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "columnHide",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "columnsUnHide",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "columnUnHide",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "restoreColumnOrder",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "resetColumnWidth",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "setResponsiveLayout",
+                "vt": "str"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 13,
+        "x": 849,
+        "y": 1632,
+        "wires": [
+            [
+                "f6856c1c.818b7"
+            ],
+            [
+                "f6856c1c.818b7"
+            ],
+            [
+                "4a472551.adc9cc"
+            ],
+            [
+                "4a472551.adc9cc"
+            ],
+            [
+                "4a472551.adc9cc"
+            ],
+            [
+                "4a472551.adc9cc"
+            ],
+            [
+                "e05d07f3.e24528"
+            ],
+            [
+                "4a472551.adc9cc"
+            ],
+            [
+                "4a472551.adc9cc"
+            ],
+            [
+                "4a472551.adc9cc"
+            ],
+            [
+                "4a472551.adc9cc"
+            ],
+            [
+                "4a472551.adc9cc"
+            ],
+            [
+                "4a472551.adc9cc"
+            ]
+        ]
+    },
+    {
+        "id": "4a472551.adc9cc",
+        "type": "link out",
+        "z": "6a99f950.207c08",
+        "name": "toTable",
+        "links": [
+            "98d9fcf3.9980e",
+            "7d2b1b0d.058af4"
+        ],
+        "x": 1018,
+        "y": 1632,
+        "wires": []
+    },
+    {
+        "id": "f6856c1c.818b7",
+        "type": "link out",
+        "z": "6a99f950.207c08",
+        "name": "toAquire",
+        "links": [
+            "b2fe3d49.3ebd",
+            "44563ace.6e30c4"
+        ],
+        "x": 1018,
+        "y": 1547,
+        "wires": []
+    },
+    {
+        "id": "5730de27.402a",
+        "type": "link out",
+        "z": "6a99f950.207c08",
+        "name": "toPlugins",
+        "links": [
+            "5de7ed48.14cae4"
+        ],
+        "x": 1239,
+        "y": 1785,
+        "wires": []
+    },
+    {
+        "id": "486144.fabefebc",
+        "type": "function",
+        "z": "6a99f950.207c08",
+        "name": "rowCommand",
+        "func": "// as this feeds back to the beginning of the flow it is time for a new message object\n// otherwise new and old data mix\n// all command data fills into a payload so it would unlikly survice verry long ;)\n\nvar msgOut={};\nswitch (msg.topic){\n    case 'unIgnoreDevice':\n        msgOut={\n            topic:msg.payload,\n            payload:{\n                \"command\":msg.topic,\n                \"object\":msg.payload\n            }\n        };\n        break;\n    case 'deleteTable':\n    case 'updateDevice':\n    case 'deleteDevice':\n    case 'ignoreDevice':\n        msgOut={\n            topic:msg.sourceMsg.topic,\n            socketid:msg.socketid,\n            payload:{\n                \"command\":msg.topic,\n                \"object\":msg.sourceMsg.topic,\n                \"$localip\":msg.sourceMsg.payload.$localip,\n                \"$name\":msg.sourceMsg.payload.$name,\n                \"name\":msg.sourceMsg.payload.name\n            }\n        };\n        break;\n    default:\n        msgOut={\n            topic:msg.sourceMsg.rowData.$topic,\n            payload:{\n                \"command\":msg.topic,\n                \"object\":msg.sourceMsg.$topic,\n                \"$localip\":msg.sourceMsg.payload.$localip,\n                \"$name\":msg.sourceMsg.payload.$name,\n                \"name\":msg.sourceMsg.payload.name,\n            }\n        }\n}\nnode.status({fill:\"green\",shape:\"dot\",text:msgOut.payload.command});\nreturn msgOut;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 675,
+        "y": 1615,
+        "wires": [
+            [
+                "5cc1cee8.eed47",
+                "2bea421.9fb7fbe"
+            ]
+        ]
+    },
+    {
+        "id": "e16374c1.f933a8",
+        "type": "function",
+        "z": "6a99f950.207c08",
+        "name": "colCommand",
+        "func": "// as this feeds back to the beginning of the flow it is time for a new message object\n// otherwise new and old data mix\n// all command data fills into a payload so it would unlikly survice verry long ;)\n\nvar msgOut={\n    topic:\"columnRightClick\",\n    payload:{\n        \"command\":msg.topic,\n        \"object\":msg.payload\n    }\n}\n\n// some commands need the column from the prosition where the context menu was triggered\n\nswitch (msg.topic){\n    case \"columnHide\":\n        msgOut.payload.object=msg.sourceMsg.payload;\n        break;\n}\nnode.status({fill:\"green\",shape:\"dot\",text:msgOut.payload.command});\nreturn msgOut;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 665,
+        "y": 1717,
+        "wires": [
+            [
+                "5cc1cee8.eed47",
+                "9d97e81b.0e5b08"
+            ]
+        ]
+    },
+    {
+        "id": "54f84404.4f890c",
+        "type": "ui_context_menu",
+        "z": "6a99f950.207c08",
+        "group": "88070f1c.adb71",
+        "order": 1,
+        "width": 0,
+        "height": -1,
+        "fontSize": 16,
+        "position": "msg",
+        "outputField": "payload",
+        "xCoordinate": "500",
+        "yCoordinate": "450",
+        "menu": "msg",
+        "menuItems": [
+            {
+                "id": "2",
+                "icon": "fa-plus-square",
+                "label": "unhide all columns",
+                "topic": "columnsUnHide",
+                "payload": "",
+                "payloadType": "str",
+                "visible": true,
+                "enabled": true
+            },
+            {
+                "id": "3",
+                "icon": "fa-recycle",
+                "label": "refresh Table",
+                "topic": "refreshTable",
+                "payload": "",
+                "payloadType": "str",
+                "visible": true,
+                "enabled": true
+            },
+            {
+                "id": "4",
+                "icon": "fa-table",
+                "label": "delete table",
+                "topic": "deleteTable",
+                "payload": "",
+                "payloadType": "str",
+                "visible": true,
+                "enabled": true
+            }
+        ],
+        "colors": "theme",
+        "textColor": "#000000",
+        "backgroundColor": "#ffffff",
+        "borderColor": "#626262",
+        "intervalLength": "2",
+        "intervalUnit": "secs",
+        "startTimerAtOpen": false,
+        "startTimerAtLeave": true,
+        "stopTimerAtEnter": true,
+        "name": "msgBased",
+        "x": 478,
+        "y": 1717,
+        "wires": [
+            [
+                "e16374c1.f933a8"
+            ]
+        ]
+    },
+    {
+        "id": "cc483143.c110f",
+        "type": "function",
+        "z": "6a99f950.207c08",
+        "name": "build column menu",
+        "func": "msg.menu=[\n    {\n        \"text\": \"update devices\",\n        \"icon\": \"fa-undo\",\n        \"enabled\": true,\n        \"topic\": \"updateDevices\",\n    },\n    {\n        \"text\": \"---\"\n    },\n    {\n        \"text\": \"hide column\",\n        \"icon\": \"fa-minus-square\",\n        \"enabled\": true,\n        \"topic\": \"columnHide\",\n    },\n    {\n        \"text\": \"unhide column\",\n        \"icon\": \"fa-minus-square-o\",\n        \"enabled\": (msg.hiddenColumns.length>0) ? true : false,\n        \"sub\": msg.hiddenColumns\n    },\n    {\n        \"text\": \"unhide all columns\",\n        \"icon\": \"fa-minus-square\",\n        \"enabled\": true,\n        \"topic\": \"columnsUnHide\",\n    },\n    {\n        \"text\": \"---\"\n    },\n    {\n        \"text\": \"restore column order\",\n        \"icon\": \"fa-sort fa-rotate-90\",\n        \"enabled\": true,\n        \"topic\": \"restoreColumnOrder\"\n    },\n    {\n        \"text\": \"reset column width\",\n        \"icon\": \"fa-arrows-h\",\n        \"enabled\": true,\n        \"topic\": \"resetColumnWidth\"\n    },\n    {\n        \"text\": \"rersponsive layout\",\n        \"icon\": \"fa-mobile\",\n        \"enabled\": true,\n        \"topic\": \"setResponsiveLayout\"\n    },\n    {\n        \"text\": \"refresh table\",\n        \"icon\": \"fa-recycle\",\n        \"enabled\": true,\n        \"topic\": \"refreshTable\"\n    },\n    {\n        \"text\": \"clear table\",\n        \"icon\": \"fa-trash\",\n        \"enabled\": true,\n        \"topic\": \"deleteTable\"\n    }\n];\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 447,
+        "y": 1666,
+        "wires": [
+            [
+                "54f84404.4f890c",
+                "1d689c31.730cc4"
+            ]
+        ]
+    },
+    {
+        "id": "76991658.87e578",
+        "type": "comment",
+        "z": "6a99f950.207c08",
+        "name": "callbacks & context menus",
+        "info": "",
+        "x": 212,
+        "y": 1513,
+        "wires": []
+    },
+    {
+        "id": "aeab8a92.8b0808",
+        "type": "comment",
+        "z": "6a99f950.207c08",
+        "name": "ui-tabel",
+        "info": "",
+        "x": 152,
+        "y": 1292,
+        "wires": []
+    },
+    {
+        "id": "a8435ae1.3b10c8",
+        "type": "function",
+        "z": "6a99f950.207c08",
+        "name": "build row menu",
+        "func": "msg.menu=[\n    {\n        \"text\": \"update device\",\n        \"icon\": \"fa-undo\",\n        \"enabled\": true,\n        \"topic\": \"updateDevice\",\n    },\n    {\n        \"text\": \"---\"\n    },\n    {\n        \"text\": \"delete device\",\n        \"icon\": \"fa-trash\",\n        \"enabled\": true,\n        \"topic\": \"deleteDevice\",\n    },\n    {\n        \"text\": \"ignore device\",\n        \"icon\": \"fa-minus-square-o\",\n        \"enabled\": true,\n        \"topic\": \"ignoreDevice\",\n    },\n    {\n        \"text\": \"unignore devices\",\n        \"icon\": \"fa-plus-square-o\",\n        \"enabled\": (msg.ignoredDevices.length>0) ? true : false,\n        \"sub\": msg.ignoredDevices\n    },\n    {\n        \"text\": \"unignore all devices\",\n        \"icon\": \"fa-plus-square\",\n        \"enabled\": true,\n        \"topic\": \"unIgnoreDevices\",\n    },\n    {\n        \"text\": \"---\"\n    },\n    {\n        \"text\": \"refresh table\",\n        \"icon\": \"fa-recycle\",\n        \"enabled\": true,\n        \"topic\": \"refreshTable\"\n    },\n    {\n        \"text\": \"clear table\",\n        \"icon\": \"fa-trash\",\n        \"enabled\": true,\n        \"topic\": \"deleteTable\"\n    }\n];\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 437,
+        "y": 1564,
+        "wires": [
+            [
+                "44cc4085.045b1",
+                "3fe7f438.e8094c"
+            ]
+        ]
+    },
+    {
+        "id": "44cc4085.045b1",
+        "type": "ui_context_menu",
+        "z": "6a99f950.207c08",
+        "group": "88070f1c.adb71",
+        "order": 1,
+        "width": 0,
+        "height": -1,
+        "fontSize": 16,
+        "position": "msg",
+        "outputField": "payload",
+        "xCoordinate": "500",
+        "yCoordinate": "450",
+        "menu": "msg",
+        "menuItems": [
+            {
+                "id": "2",
+                "icon": "fa-plus-square",
+                "label": "unhide all columns",
+                "topic": "columnsUnHide",
+                "payload": "",
+                "payloadType": "str",
+                "visible": true,
+                "enabled": true
+            },
+            {
+                "id": "3",
+                "icon": "fa-recycle",
+                "label": "refresh Table",
+                "topic": "refreshTable",
+                "payload": "",
+                "payloadType": "str",
+                "visible": true,
+                "enabled": true
+            },
+            {
+                "id": "4",
+                "icon": "fa-table",
+                "label": "delete table",
+                "topic": "deleteTable",
+                "payload": "",
+                "payloadType": "str",
+                "visible": true,
+                "enabled": true
+            }
+        ],
+        "colors": "theme",
+        "textColor": "#000000",
+        "backgroundColor": "#ffffff",
+        "borderColor": "#626262",
+        "intervalLength": "2",
+        "intervalUnit": "secs",
+        "startTimerAtOpen": false,
+        "startTimerAtLeave": true,
+        "stopTimerAtEnter": true,
+        "name": "msgBased",
+        "x": 478,
+        "y": 1615,
+        "wires": [
+            [
+                "486144.fabefebc"
+            ]
+        ]
+    },
+    {
+        "id": "2b297179.f6edde",
+        "type": "debug",
+        "z": "6a99f950.207c08",
+        "name": "homie device",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 631,
+        "y": 629,
+        "wires": []
+    },
+    {
+        "id": "924005b6.47cf78",
+        "type": "debug",
+        "z": "6a99f950.207c08",
+        "name": "clicked on cell",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "x": 1066,
+        "y": 1292,
+        "wires": []
+    },
+    {
+        "id": "2607532f.25878c",
+        "type": "link in",
+        "z": "6a99f950.207c08",
+        "name": "callbacksIn",
+        "links": [
+            "b6c50a05.4d4858"
+        ],
+        "x": 117,
+        "y": 1632,
+        "wires": [
+            [
+                "befa92d0.11e9",
+                "8c55ae5a.67e4b"
+            ]
+        ]
+    },
+    {
+        "id": "b6c50a05.4d4858",
+        "type": "link out",
+        "z": "6a99f950.207c08",
+        "name": "callbacksOut",
+        "links": [
+            "2607532f.25878c"
+        ],
+        "x": 644,
+        "y": 1445,
+        "wires": []
+    },
+    {
+        "id": "9d97e81b.0e5b08",
+        "type": "debug",
+        "z": "6a99f950.207c08",
+        "name": "colCommand",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "x": 869,
+        "y": 1751,
+        "wires": []
+    },
+    {
+        "id": "b0fed137.a74e7",
+        "type": "debug",
+        "z": "6a99f950.207c08",
+        "name": "table callback",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "x": 1066,
+        "y": 1326,
+        "wires": []
+    },
+    {
+        "id": "a211471f.4ec008",
+        "type": "debug",
+        "z": "6a99f950.207c08",
+        "name": "to ui-table",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "x": 689,
+        "y": 1377,
+        "wires": []
+    },
+    {
+        "id": "2bea421.9fb7fbe",
+        "type": "debug",
+        "z": "6a99f950.207c08",
+        "name": "rowCommand",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "x": 879,
+        "y": 1513,
+        "wires": []
+    },
+    {
+        "id": "8c55ae5a.67e4b",
+        "type": "debug",
+        "z": "6a99f950.207c08",
+        "name": "callback",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "x": 247,
+        "y": 1700,
+        "wires": []
+    },
+    {
+        "id": "3ac75021.dd731",
+        "type": "ui_toast",
+        "z": "6a99f950.207c08",
+        "position": "dialog",
+        "displayTime": "3",
+        "highlight": "",
+        "sendall": false,
+        "outputs": 1,
+        "ok": "OK",
+        "cancel": "Cancel",
+        "raw": false,
+        "topic": "",
+        "name": "OK / Cancel",
+        "x": 1294,
+        "y": 1700,
+        "wires": [
+            [
+                "e05d07f3.e24528"
+            ]
+        ]
+    },
+    {
+        "id": "3fe7f438.e8094c",
+        "type": "debug",
+        "z": "6a99f950.207c08",
+        "name": "rowMenu",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "x": 655,
+        "y": 1564,
+        "wires": []
+    },
+    {
+        "id": "1d689c31.730cc4",
+        "type": "debug",
+        "z": "6a99f950.207c08",
+        "name": "columnMenu",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 665,
+        "y": 1666,
+        "wires": []
+    },
+    {
+        "id": "e05d07f3.e24528",
+        "type": "subflow:fd36bbc4.fe50d8",
+        "z": "6a99f950.207c08",
+        "name": "delete Table?",
+        "env": [
+            {
+                "name": "message",
+                "value": "Do you realy whant to delete the complete table and all statistics. Cell edits and layout will be preserved.",
+                "type": "str"
+            }
+        ],
+        "x": 1115,
+        "y": 1751,
+        "wires": [
+            [
+                "3ac75021.dd731"
+            ],
+            [
+                "5730de27.402a"
+            ]
+        ]
+    },
+    {
+        "id": "ae1ca437.304d58",
+        "type": "delay",
+        "z": "6a99f950.207c08",
+        "name": "1s",
+        "pauseType": "delay",
+        "timeout": "1",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 288,
+        "y": 1360,
+        "wires": [
+            [
+                "961e8359.3a95b"
+            ]
+        ]
+    },
+    {
+        "id": "4eb5d2d8.ecd7ac",
+        "type": "link out",
+        "z": "6a99f950.207c08",
+        "name": "toPlugins",
+        "links": [
+            "912e36c8.8ff638"
+        ],
+        "x": 576,
+        "y": 595,
+        "wires": []
+    },
+    {
+        "id": "dc012d6b.57b83",
+        "type": "homie-convention-state",
+        "z": "6a99f950.207c08",
+        "broker": "6bb8f98.7e5f308",
+        "name": "broker.hivemq.com",
+        "stateDeviceID": "[any]",
+        "infoFw": true,
+        "infoStats": true,
+        "infoTiming": false,
+        "infoError": false,
+        "x": 209,
+        "y": 748,
+        "wires": [
+            [
+                "42fd90d.6522d7",
+                "b7d3b368.c6015"
+            ]
+        ]
+    },
+    {
+        "id": "4951246.99046dc",
+        "type": "comment",
+        "z": "6a99f950.207c08",
+        "name": "Device State",
+        "info": "# homie convention source\n## introduction\nthe homie convention defines some statistic and firmware topics. The remote-device-table originates using the $stats and $fw properties defined in the homie convention 3.0.0 and later made available in version 4.0.0 through so called extensions.\nIf an alternative source provides all or some of the data it should first try to use the existing properties and perform conversions if nessesary.\n\n## reserved properties\nproperty | description | type    | format \n-------- | ----------- | ------- | ------ \n$homie | The implemented Homie convention version | **string** | \"4.0.0\"\n$name | the **unique** name of the device. This name is used to identify the device in the table. | string | \"myDevice\"\n$state | current or last state of the device | string | [\"ready\", \"lost\", \"init\", \"sleeping\", \"disconnected\", \"alert\"]\n$nodes\t| Nodes the device exposes | array | comma seperated list\n$extensions\t| Supported extensions | array | comma seperated list\n$implementation | An identifier for the Homie implementation | string | \"esp8266\"\n\n\n\ndefined by [**Legacy Firmware**](https://github.com/homieiot/convention/blob/develop/extensions/documents/homie_legacy_firmware_extension.md)\n\nproperty | description | type    | format\n-------- | ----------- | ------- | ------\n$localip | IP of the device on the local network | string | \"127.0.0.1\"\n$mac | Mac address of the device network interface | string | The format MUST be of the type `A1:B2:C3:D4:E5:F6`\nname | Name of the firmware running on the device. | string | Allowed characters are the same as the device ID\nversion | Version of the firmware running on the device. | string | \"1.0.0\"\n\n\ndefined by [**Legacy Stats**](https://github.com/homieiot/convention/blob/develop/extensions/documents/homie_legacy_stats_extension.md)\n\nproperty | description | type    | format\n-------- | ----------- | ------- | ------\ninterval | Interval in seconds at which the device refreshes its `$stats/+` | integer | Positive greater 0\nuptime | Time elapsed in seconds since the boot of the device | integer | seconds\nsignal | Signal strength | Integer | in %\ncputemp | CPU Temperature | Float | in °C\ncpuload | CPU Load in. Average of last $stats\\interval including all CPUs | Integer | %. \nbattery | Battery level. | Integer | in %\nfreeheap | Free heap. |\tPositive Integer | in bytes\nsupply | Supply Voltage | Float | in V\n\n",
+        "x": 172,
+        "y": 697,
+        "wires": []
+    },
+    {
+        "id": "42fd90d.6522d7",
+        "type": "link out",
+        "z": "6a99f950.207c08",
+        "name": "toPlugins",
+        "links": [
+            "912e36c8.8ff638"
+        ],
+        "x": 389,
+        "y": 748,
+        "wires": []
+    },
+    {
+        "id": "b7d3b368.c6015",
+        "type": "debug",
+        "z": "6a99f950.207c08",
+        "name": "homie state",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "x": 444,
+        "y": 714,
+        "wires": []
+    },
+    {
+        "id": "44563ace.6e30c4",
+        "type": "link in",
+        "z": "6a99f950.207c08",
+        "name": "aquire",
+        "links": [
+            "f6856c1c.818b7",
+            "337630c7.73f26"
+        ],
+        "x": 117,
+        "y": 816,
+        "wires": [
+            [
+                "3be768c6.77ddf8"
+            ]
+        ]
+    },
+    {
+        "id": "3be768c6.77ddf8",
+        "type": "function",
+        "z": "6a99f950.207c08",
+        "name": "ask homie for update",
+        "func": "var msgOut={};\nswitch (msg.payload.command){\n    case \"updateDevice\":\n        if (msg.topic && msg.topic.includes('/homie/')) { // seams to be a homie message\n            msgOut = {\n                \"topic\":msg.topic,\n                \"broker\":msg.topic.substring(0,msg.topic.indexOf('/homie/')),\n                \"payload\":msg.payload.$name\n            }\n            return msgOut;\n        }\n        break;\n    case \"updateDevices\":\n        msgOut = {\n            \"topic\":msg.topic,\n            \"payload\":\"[any]\"\n        }\n        return msgOut;\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 270,
+        "y": 816,
+        "wires": [
+            [
+                "dc012d6b.57b83"
+            ]
+        ]
+    },
+    {
+        "id": "a3700c8b.4cd71",
+        "type": "comment",
+        "z": "6a99f950.207c08",
+        "name": "Sensor Data for Table",
+        "info": "",
+        "x": 202,
+        "y": 561,
+        "wires": []
+    },
+    {
+        "id": "38ade293.71e85e",
+        "type": "function",
+        "z": "6a99f950.207c08",
+        "name": "add icons",
+        "func": "var icons= {\n    \"$state\":[\n        {\"value\":\"init\",\"icon\":\"fa fa-cog fa-spin\"},\n        {\"value\":\"ready\",\"icon\":\"fa fa-spinner fa-spin\"},\n        {\"value\":\"disconnected\",\"icon\":\"fa fa-times\"},\n        {\"value\":\"sleeping\",\"icon\":\"fa fa-moon-o\"},\n        {\"value\":\"lost\",\"icon\":\"fa fa-question-circle\"},\n        {\"value\":\"lostBroker\",\"icon\":\"fa fa-exclamation-triangle\"},\n        {\"value\":\"alert\",\"icon\":\"fa fa-exclamation-triangle\"}\n    ],\n    \"signal\":[\n        {\"value\":10,\"icon\":\"perm_scan_wifi\",\"style\":\"color:#cc0000\"},\n        {\"value\":20,\"icon\":\"wifi\",\"style\":\"color:#cc3300\"},\n        {\"value\":30,\"icon\":\"wifi\",\"style\":\"color:#cc6600\"},\n        {\"value\":40,\"icon\":\"wifi\",\"style\":\"color:#cc9900\"},\n        {\"value\":50,\"icon\":\"wifi\",\"style\":\"color:#cccc00\"},\n        {\"value\":60,\"icon\":\"wifi\",\"style\":\"color:#99cc00\"},\n        {\"value\":70,\"icon\":\"wifi\",\"style\":\"color:#66cc00\"},\n        {\"value\":80,\"icon\":\"wifi\",\"style\":\"color:#33cc00\"},\n        {\"value\":100,\"icon\":\"signal_wifi_4_bar\",\"style\":\"color:#00cc00\"},\n    ],\n    \"battery\":[\n        {\"value\":10,\"icon\":\"battery-alert\",\"style\":\"color:#cc0000\"},\n        {\"value\":20,\"icon\":\"battery_20\"},\n        {\"value\":30,\"icon\":\"battery_30\"},\n        {\"value\":50,\"icon\":\"battery_50\"},\n        {\"value\":60,\"icon\":\"battery_60\"},\n        {\"value\":70,\"icon\":\"battery_70\"},\n        {\"value\":80,\"icon\":\"battery_80\"},\n        {\"value\":90,\"icon\":\"battery_90\"},\n        {\"value\":100,\"icon\":\"battery_full\",\"style\":\"color:#00cc00\"},\n    ]\n};\n\nvar status = {fill:\"yellow\",shape:\"dot\",text: \"no msg.state\"};\nif (msg.hasOwnProperty(\"state\")) {\n    status.text=\"device=\";\n    status.text+=(msg.state.$name) ? msg.state.$name : msg.topic;\n    var formatHtml=function(icon) {\n        var html=\"\"\n        if (icon.icon.startsWith('fa')) {\n            html = \"<i class=\\\"\"+icon.icon+'\\\"></i>'; \n        } else {\n            html+='<i class=\"material-icons\"';\n            if (icon.hasOwnProperty(\"style\")) html+=' style=\"'+icon.style+'\"';\n            html+='>'+icon.icon+'</i>';                               \n        }\n        return html;\n    }\n    nextProperty: \n    for (var state in msg.state) {\n        if (icons.hasOwnProperty(state)) {\n            for (var icon of icons[state]) {\n                switch (typeof msg.state[state]) {\n                    case \"string\":\n                        if (msg.state[state]===icon.value) {\n                            msg.state[state+\"Icon\"]=formatHtml(icon);\n                            status.fill=\"green\";\n                            status.text+=state+\" \";\n                            continue nextProperty;\n                        }\n                        break;    \n                    case \"number\":\n                        if (msg.state[state]<=icon.value) {\n                            msg.state[state+\"Icon\"]=formatHtml(icon);\n                            status.fill=\"green\";\n                            status.text+=state+\" \";\n                            continue nextProperty;\n                        }\n                        break;\n                }\n            }\n        }\n    }    \n}\nnode.status(status);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 366,
+        "y": 1054,
+        "wires": [
+            [
+                "41226545.86ae5c"
+            ]
+        ],
+        "icon": "font-awesome/fa-wifi",
+        "info": "# Add and format icons\n- This node is configured by a json object. \n- All incomming data inside `msg.state`is inspected to the parent keys of this object. \n- The value contains an array of objects defining differend icons and styles to be added.\n- a html formatted string is added to `msg.state.[key+\"Icon\"]`\n- the current version supports font awesome icons supported by the dshboard and material icons including the style and size [ToDo] property\n- Sting values will be compared for a case sensitive match\n- values will be compared `<=`. So arrange the objects in a increasing order.\n\n## configuration object\n- defining the keys to be triggered\n```json\n{\n    \"$state\":[],\n    \"signal\":[],\n    \"battery\":[]\n}\n```\n- to trigger on a the value \"init\" to get a font awsome icon plce ´fa´ at the beginning of the `icon` value\n```json\n{\n    \"value\":\"init\",\n    \"icon\":\"fa fa-cog fa-spin\"\n}\n```\nfor material icons you can use\n```json\n{\n    \"value\":10,\n    \"icon\":\"perm_scan_wifi\",\n    \"style\":\"color:#cc0000\"\n}\n```\n"
+    },
+    {
+        "id": "63239d34.f281e4",
+        "type": "function",
+        "z": "6a99f950.207c08",
+        "name": "lastSeen",
+        "func": "if (msg.hasOwnProperty(\"payload\") && msg.payload.hasOwnProperty(\"command\")) {\n    switch (msg.payload.command) {\n        case \"deleteTable\":\n            context.set(\"lastSeen\",undefined);\n            context.set(\"lastState\",undefined);\n            node.status({fill:\"yellow\",shape:\"dot\",text:\"lastSeen&lastState deleted\"});\n            node.warn(\"[lastSeen] lastSeen&lastState deleted\");\n            return msg;\n    }\n}\n\nif (msg.hasOwnProperty(\"topic\") && (msg.hasOwnProperty(\"state\") || msg.payload.hasOwnProperty(\"command\"))) {\n    var lastSeen = context.get(\"lastSeen\");\n    if (lastSeen===undefined) {\n        lastSeen={};\n        context.set(\"lastSeen\",lastSeen);\n    }\n    var lastState = context.get(\"lastState\");\n    if (lastState===undefined) {\n        lastState={};\n        context.set(\"lastState\",lastState);\n    }\n    \n    var pad = function (num) {\n        return (\"0\"+num).slice(-2);\n    };\n    var formatLastSeen = function(lastSeen){\n        if (lastSeen>0) {\n            var secs = Math.floor((Date.now() - lastSeen) / 1000);\n            var minutes = Math.floor(secs / 60);\n            secs = secs%60;\n            var hours = Math.floor(minutes/60);\n            minutes = minutes%60;\n            var days = Math.floor(hours/24);\n            hours = hours%24;\n            if (days>0) {\n                return days+\"days \"+hours+\"hours ago\";\n            } else if (hours>0) {\n                return pad(hours)+\":\"+pad(minutes)+\" ago\";\n            } else if (minutes>0) {\n                return minutes+\"min ago\";\n            } else {\n                return secs+\"s ago\";\n            }\n        }\n        return \"n/a\";\n    }\n    \n    if (msg.hasOwnProperty(\"state\")) {\n        if (msg.state.hasOwnProperty(\"$state\")) {\n            // do not add timestamp if $status==\"lost\" (this is the LWT form the broker)\n            if (!lastSeen.hasOwnProperty(msg.topic)) lastSeen[msg.topic]={};\n            lastState[msg.topic]=msg.state.$state;\n            \n            if (msg.state.$state===\"lost\"){\n                if (lastSeen.hasOwnProperty(msg.topic)) {\n                    msg.state.lastSeenreadyFormatted=\"lost \"+formatLastSeen(lastSeen[msg.topic].ready);\n                } else {\n                    msg.state.lastSeenreadyFormatted=\"never seen\";\n                }\n            } else {\n                msg.state[\"lastSeen\"+msg.state.$state]=Date.now();\n                msg.state[\"lastSeen\"+msg.state.$state+\"Formatted\"]=formatLastSeen(lastSeen[msg.topic][msg.state.$state]);\n                lastSeen[msg.topic][msg.state.$state]=msg.state[\"lastSeen\"+msg.state.$state];\n            }\n        }\n    } else if (msg.payload.hasOwnProperty(\"command\")) {\n        switch (msg.payload.command) {\n            case \"updateData\":\n                msg.payload.arguments=[[]];\n                for (let topic in lastSeen) {\n                    if (lastSeen.hasOwnProperty(topic)) {\n                        let lineData={\"$topic\":topic};\n                        for (let value in lastSeen[topic]) {\n                            if (lastSeen[topic].hasOwnProperty(value)) {\n                                lineData[\"lastSeen\"+value]=lastSeen[topic][value];\n                                lineData[\"lastSeen\"+value+\"Formatted\"]=formatLastSeen(lastSeen[topic][value]);\n                            }\n                        }\n                        if (lastState[topic]===\"lost\") {\n                            if (lastSeen[topic].hasOwnProperty(\"ready\")) {\n                                lineData[\"lastSeenreadyFormatted\"]=\"lost \"+formatLastSeen(lastSeen[topic].ready); \n                            } else {\n                                lineData[\"lastSeenreadyFormatted\"]=\"never seen\";\n                            }\n                        }\n                        msg.payload.arguments[0].push(lineData);\n                    }\n                }\n                break;\n            default:\n                break;\n        }\n    }\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 366,
+        "y": 952,
+        "wires": [
+            [
+                "552ecc45.60e3c4"
+            ]
+        ],
+        "icon": "node-red/timer.svg",
+        "info": "# build last seen timestamps\n## description\nThis function looks for msg.state.$state messages and add a timestamp (absolute and difference from last occurence)\n## how to use\n- Place this node in your data stream before the `handle tableData` node. The payload must be like this to be activated. Other messages will be passed through\n```\nmsg.payload.state={\n    $name : \"deviceName\",\n    $state : \"anyState\"\n}\n```\n\n- Place a inject node infront with msg.payload\n```json\n{\n    \"command\": \"updateData\",\n    \"column\": \"lastSeen\"\n}\n```\nto get the formatted last seen string updtated the inject node should repead every mnute or so. \n\n### last seen formatted\na formatted string is generated out of the last known timestamp saved in node context and the actual one. The difference between last occurance and the current time is formatted as a human readable string. This ist especially usefull to track `lost` or `sleeping` devices. As this string will change over time even when the value stays constant and is not updated by the mqtt the inject node should trigger every minute.\nThe `lost` state is handeled a little bit different as this is issued by the broker as a LWT (last will topic). in this case the timestamp is irrelevant because it is not issued by the device. The last seen timestamp of the `ready` state is used instead to issue the last time the device is seen. If the device was never seeen in since the start of this flow `never`will be sent.\n\nExample:\n\n- Input:\n```\nmsg.payload.state={\n    $name : \"deviceName\",\n    $state : \"ready\"\n}\n```\n- Output\n```\nmsg.payload.state={\n    $name : \"deviceName\",\n    $state : \"ready\",\n    lastSeenready : unixTimeStamp,\n    lastSeenreadyFormatted : \"01:10 ago\"\n}\n```\n\n### data storage\nNo database is required. Al data is stored in the **node context** on `default` context provider. As all data is **live** and automaticaly rebuild after restart is is not nessesary and not recomended that anything else than `memory Only` is used.\n\n- `lastSeen` _object_ stores all last seen values  to compare against new values to format the human readable string\n- `lastState` _object_ stores all last values of $state in order to handle the special `$state='lost'` "
+    },
+    {
+        "id": "852bc10a.87f3a",
+        "type": "inject",
+        "z": "6a99f950.207c08",
+        "name": "update",
+        "repeat": "60",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "updateColumn",
+        "payload": "{\"command\":\"updateData\",\"column\":\"lastSeen\"}",
+        "payloadType": "json",
+        "x": 179,
+        "y": 986,
+        "wires": [
+            [
+                "63239d34.f281e4"
+            ]
+        ]
+    },
+    {
+        "id": "7b98006d.3c02e",
+        "type": "comment",
+        "z": "6a99f950.207c08",
+        "name": "Plugins",
+        "info": "",
+        "x": 152,
+        "y": 901,
+        "wires": []
+    },
+    {
+        "id": "41226545.86ae5c",
+        "type": "function",
+        "z": "6a99f950.207c08",
+        "name": "resetCounter",
+        "func": "if (msg.hasOwnProperty(\"payload\") && msg.payload.hasOwnProperty(\"command\")) {\n    switch (msg.payload.command) {\n        case \"deleteTable\":\n            context.set(\"tableData\",undefined);\n            node.status({fill:\"yellow\",shape:\"dot\",text:\"tableData deleted\"});\n            node.warn(\"[resetCounter] tableData deleted\");\n            return msg;\n    }\n}\nconst pluginName=\"resetCounter\";\nconst triggerProperty=\"uptime\";\n\nvar status = {fill:\"red\",shape:\"dot\",text: \"payload=\"+msg.payload};\n// only trigger if msg.state exits and contains the property $name as a unique identifier\nif (msg.hasOwnProperty(\"state\") && msg.topic!==undefined && msg.topic!==\"\") {\n    status.text=\"device=\";\n    status.text+=(msg.state.$name) ? msg.state.$name : msg.topic;\n    status.fill=\"yellow\";\n    // if the plugin needs to save context data\n    var deviceName = msg.topic;\n    var tableData = context.get(\"tableData\",\"file\");\n    if (tableData===undefined) {\n        tableData={};\n        context.set(\"tableData\",tableData,\"file\");\n    }\n    // if the plugin only reacts on certain values (i.e. uptime)\n    if (msg.state.hasOwnProperty(triggerProperty)) {\n        if (!tableData.hasOwnProperty(deviceName)) {\n            tableData[deviceName]={\n                \"resetTotal\":0,\n                \"totalRuntime\":0\n            }\n        }\n        var tableRow=tableData[deviceName];\n        var success=false;\n        \n        // -------------------------------------------------\n        var dateNow=Date.now();\n        if (msg.state.hasOwnProperty(\"$status\")) {\n            switch (msg.state.$status) {\n                case \"sleeping\":\n                    //tableRow.totalRuntime+=tableRow.lastUptime;\n                    tableRow.lastUptime=0;\n                    status.text=\" sleeping\";\n                    break;\n                case \"lost\":\n                    tableRow.lostSince=dateNow;\n                    break;\n            }\n        }\n        if (tableRow.hasOwnProperty(\"lastUptime\")) {\n            // node.warn([msg.state.uptime,tableRow.lastUptime]);\n            if (Number(msg.state.uptime) < tableRow.lastUptime) { // reset detected!\n                if (tableRow.hasOwnProperty(\"lostSince\")) {\n                    tableRow.resetPeriodLast = tableRow.lostSince-tableRow.resetLast;\n                    delete tableRow.resetLast;\n                    delete tableRow.lostSince;\n                }\n                if (tableRow.hasOwnProperty(\"resetLast\")) {\n                    tableRow.resetPeriodLast = dateNow-tableRow.resetLast;\n                }\n                if (tableRow.resetTotal>0) {\n                    tableRow.resetAverage = Math.floor(tableRow.totalRuntime / tableRow.resetTotal);\n                    msg.state.resetAverage=tableRow.resetAverage;\n                    msg.state.resetTotal=tableRow.resetTotal;\n                    msg.state.resetLast=tableRow.resetLast;\n                    msg.state.totalRuntime=tableRow.totalRuntime;\n                }\n            \n                tableRow.resetLast=dateNow;\n                ++tableRow.resetTotal;\n            } else { // device alive - counting up\n                tableRow.totalRuntime += Number(msg.state.uptime)-tableRow.lastUptime;\n            }\n            tableRow.lastUptime=Number(msg.state.uptime);\n        } else { // first recorded uptime + first seen\n            tableRow.lastUptime=Number(msg.state.uptime);\n            tableRow.totalRuntime=tableRow.lastUptime;\n            if (!tableRow.hasOwnProperty(\"firstSeen\")) {\n                tableRow.firstSeen=dateNow;\n                msg.state.firstSeen=dateNow;\n            }\n        }\n        success=true;\n        // -------------------------------------------------\n        \n        if (success) {\n            if (msg.state.hasOwnProperty(\"resetTotal\")) {\n                status.fill=\"green\"\n                status.text=msg.topic+\" resets=\"+msg.state.resetTotal;\n                node.status(status);\n            }\n        } else {\n            status.error({\"pluginName\":pluginName,triggerProperty:msg.state[triggerProperty],\"state\":msg.state})\n            status.text=\"Error device:\"+msg.topic+\" \"+triggerProperty+\"=\"+msg.state[triggerProperty];\n            node.status(status);           \n        }\n    }\n}\n// always pass the original message (+ additional data as suitable)\n// node.warn([\"reset\",msg.topic])\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 376,
+        "y": 1105,
+        "wires": [
+            [
+                "757ac8a0.0be728"
+            ]
+        ],
+        "info": "# reset counter\nDetection of device resets. A reset of a device delivering a uptime value can be detected if the delivered uptime value is lower than the value before.\nIf `msg.state.$state==\"lost\"` is detected a timestamp is recorded. if a new `uptime<lastUptime` is detected the recorded \"lost\" timestamp is used insted of `date.now()`\nif `msg.state.$sate==\"sleeping\"` is detected a timestamp is recorded. On next `ready` the lastUptime is set to 0 so the lower `uptime` does not count as a reset.\n\n## context store\n\n`tabledata` in node context. As the totalRuntime should be calculated over flow restart / reset it shoul be saved to persistent memory\n\n## property trigger\n`msg.state.uptime` period between boot and now _in seconds_\n\n## properties used / required\nproperty | required | unique\n-------- | -------- | -------\n`msg.state.$name` | **required** | **unique**\n`msg.state.uptime` | **required** |\n`msg.state.$lost` | **optional** |\n\n\n## values added\nproperty | description | unit\n-------- | ----------- | ----\n`msg.state.resetAverage` | average period between resets | _in ms_\n`msg.state.resetTotal` | total resets detected | _integer_\n`msg.state.resetLast` | last reset detected | _unix timestamp_\n`msg.state.totalRuntime` | total runtime from first detection to now | _in ms_"
+    },
+    {
+        "id": "912e36c8.8ff638",
+        "type": "link in",
+        "z": "6a99f950.207c08",
+        "name": "Plugins",
+        "links": [
+            "42fd90d.6522d7",
+            "7649d937.146c48",
+            "4eb5d2d8.ecd7ac",
+            "b0eb19f5.3183d8"
+        ],
+        "x": 134,
+        "y": 952,
+        "wires": [
+            [
+                "63239d34.f281e4"
+            ]
+        ]
+    },
+    {
+        "id": "552ecc45.60e3c4",
+        "type": "function",
+        "z": "6a99f950.207c08",
+        "name": "$state=\"alarm\" watchdog",
+        "func": "// -------------------------------------------------------------------\n// this function provides a timeOut function send an Alarm if configured\n// devices did not send any $state messages\n// On every received msg.state.$state it resets the timer\n// if the timer runs out it issues msg.state.$state=\"alarm\" and a message to \n// the extra filed msg.state.resetReason\n// can be configured by:\n// flow.tableData[deviceId].state.alarmTimeout in seconds\n// -------------------------------------------------------------------\n\nif (msg.hasOwnProperty(\"payload\") && msg.payload.hasOwnProperty(\"command\")) {\n    switch (msg.payload.command) {\n        case \"deleteTable\":\n            let alarmTimers = context.get(\"alarmTimers\") || {};\n            Object.keys(alarmTimers).forEach((key,index) => {\n                clearTimeout(alarmTimers[key].timer);\n            });\n            context.set(\"alarmTimers\",undefined);\n            node.status({fill:\"yellow\",shape:\"dot\",text:\"All timers deleted\"});\n            node.warn(\"[$state=\\\"alarm\\\" watchdog] All timers deleted\");\n            return [msg,null];\n    }\n}\n\nvar timeout=0     // in seconds (set to 0 because this feature should be activated by an msg.state.alarmTimeout)\n\nvar status={fill:\"red\",shape:\"dot\",text:\"\"};\nif (msg.hasOwnProperty(\"state\") && msg.state.hasOwnProperty(\"alarmTimeout\")) {\n    if (!Number.isNaN(Number(msg.state.interval))) {\n        timeout=Number(msg.state.interval);\n    } else {\n        status.text=\"[$state watchdog] msg.state.interval is NaN\";\n        node.error([status.text,msg]);\n        node.status(status);\n        return msg;\n    }\n}\nvar resetReason=\"device in alarm state! No refresh the last \"+timeout+\"sec\"\n\n// ------------------------------------------------------\n// emulate timeout for $state=\"alarm\"\n// ------------------------------------------------------\nfunction mqttTimeout(arg) {\n    arg.node.send([arg.msg,arg.msg]);\n}\n    \nif (timeout>0 && msg.hasOwnProperty(\"topic\")) {\n    // we have to keep track on existing timers\n    let alarmTimers = context.get(\"alarmTimers\"); // allways memoryOnly as the timers do not extist after restart\n    if (alarmTimers===undefined) {\n        alarmTimers={};\n        context.set(\"alarmTimers\",alarmTimers);\n    }\n    if (alarmTimers.hasOwnProperty(msg.topic)) { // timer exists so clear it first\n        clearTimeout(alarmTimers[msg.topic].timer);\n    }\n    if (!alarmTimers.hasOwnProperty(msg.topic)) alarmTimers[msg.topic]={};\n    alarmTimers[msg.topic].timeout=timeout;\n    alarmTimers[msg.topic].timer=setTimeout(mqttTimeout, timeout*1000, \n        {\n            \"node\":node,\n            \"msg\":{\n                \"topic\":msg.topic,\n                \"state\":{\n                    \"$state\":\"alarm\",\n                    \"resetReason\":resetReason\n                }\n                \n            }\n        }\n    );\n    node.status({fill:\"green\",shape:\"dot\",text:msg.topic+\"=\"+timeout+\"s\"});\n}\n\nreturn [msg,null];",
+        "outputs": 2,
+        "noerr": 0,
+        "x": 416,
+        "y": 1003,
+        "wires": [
+            [
+                "38ade293.71e85e"
+            ],
+            []
+        ],
+        "icon": "node-red/swap.svg",
+        "info": "# msg.state.$state watchdog\n## decription\n* this function provides a timeOut function (watchdog) to emulate the LWT functionality\nissueing $state=\"alarm\" if a device did not update in time. \n* On every received msg.state.$state it resets the timer\n* If the timer runs out it issues `msg.state.$state=\"alarm\"` and a message to \nthe extra filed `msg.state.resetReason`\n* There is no property defined in the homie convention to specify a alarm duration. It is up to the device to set the `$state` to **alarm** but most likely the device is not able to do this because of its alarem condition\n* \n* On the second output the alarm message is branched of to conect to a messaging node\n\nyou can find more about the [homie convention device lifecyle here](https://homieiot.github.io/specification/#device-lifecycle).\n\n## how to use\n- place it in the main plugin list if you like to have a watchdog for every device with the same timeout\n- place it after a translator / data source if only some devices need a watchdog because they do not supprt mqtt LWT or similar techniques to detect offline devices and set the msg.state.$state correcty over the complete lifecycle.\n- place diffent watchdogs in the aquisition area behind translators if you need **individual timeout durations**.\n- edit the `timeout` variable in the code or\n- send msg.state.interval to set individual timeout by message\n\n## do do / issues\n- have to find out if a clearTimeout / setTimeout on every message is the most efficient way.\n- perhaps own code with one interval timer more efficient for a bigger number of devices\n\n## homie features\n- `$state` *string* current state of the device\n- \n\n## extended features\n- `resetReason` *string* description that the device was flaged by the watchdog"
+    },
+    {
+        "id": "757ac8a0.0be728",
+        "type": "function",
+        "z": "6a99f950.207c08",
+        "name": "sleepTimer",
+        "func": "const pluginName=\"sleepTimer\"; // give the plugin a unique name\nconst triggerProperty=\"$state\"; // if the plugin triggers on one specific property you can specifie it here\nconst contextName=\"tableData\"; // name of context store\n\nif (msg.hasOwnProperty(\"payload\") && msg.payload.hasOwnProperty(\"command\")) {\n    switch (msg.payload.command) {\n        case \"deleteTable\":\n            context.set(contextName,undefined);\n            node.status({fill:\"yellow\",shape:\"dot\",text:contextName+\" deleted\"});\n            node.warn(\"[\"+pluginName+\"] \"+contextName+\"deleted\");\n            return msg;\n    }\n}\n\nvar status = {fill:\"red\",shape:\"dot\",text: \"payload=\"+msg.payload};\n// only trigger if msg.state exitst and contains the property $name as a unique identifier\nif (msg.hasOwnProperty(\"state\") && msg.topic!==undefined && msg.topic!==\"\") {\n    status.text=\"device=\";\n    status.text+=(msg.state.$name) ? msg.state.$name : msg.topic;\n    status.fill=\"yellow\";\n    // if the plugin needs to save context data\n    var deviceName = msg.topic;\n    var tableData = context.get(contextName);\n    if (tableData===undefined) {\n        tableData={};\n        context.set(contextName,tableData);\n    }\n    // if the plugin only reacts on certain values (i.e. uptime)\n    if (msg.state.hasOwnProperty(triggerProperty)) { // add additional triggers here\n        if (!tableData.hasOwnProperty(deviceName)) {\n            if (msg.state[triggerProperty]==='sleeping') { // only activate if device is sleeping once\n                tableData[deviceName]={};\n                msg.state.sleepMode=true;\n            } else {\n                msg.state.sleepMode=false;\n                return msg; // sleepMode not enabled yet\n            }\n        }\n        var tableRow=tableData[deviceName];\n        var success=false;\n        \n        // -------------------------------------------------\n        var dateNow=Date.now();\n        switch (msg.state[triggerProperty]) {\n            case 'sleeping':\n                if (tableRow.lastEvent==='ready' && tableRow.hasOwnProperty('awakeTimestamp')) {\n                    tableRow.awakeTime=Math.floor((dateNow - tableRow.awakeTimestamp)/1000); // in seconds\n                }\n                if (tableRow.lastEvent!=='sleeping') {\n                    tableRow.sleepTimestamp=dateNow;\n                    tableRow.lastEvent='sleeping';\n                }\n                break;\n            case 'ready':\n                if (tableRow.lastEvent==='sleeping' && tableRow.hasOwnProperty('sleepTimestamp')) {\n                    tableRow.sleepTime=Math.floor((dateNow - tableRow.sleepTimestamp)/1000); // in seconds\n                }\n                if (tableRow.lastEvent!=='ready') {\n                    tableRow.awakeTimestamp=dateNow;\n                    tableRow.lastEvent='ready';\n                }\n                break;\n            case 'lost':\n                if (tableRow.lastEvent!=='lost') {\n                    // device went from sleeping to lost\n                    if (tableRow.lastEvent==='sleeping' && tableRow.hasOwnProperty('sleepTimestamp')) {\n                        tableRow.sleepTime=Math.floor((dateNow - tableRow.sleepTimestamp)/1000); // in seconds\n                        delete tableRow.sleepTimestamp;\n                    }\n                    // device went form ready to lost\n                    if (tableRow.lastEvent==='ready' && tableRow.hasOwnProperty('awakeTimestamp')) {\n                        tableRow.awakeTime=Math.floor((dateNow - tableRow.awakeTimestamp)/1000); // in seconds\n                        delete tableRow.awakeTimestamp;\n                    }\n                    tableRow.lastEvent='lost';\n                }\n                break;\n            case 'diconnected':\n                delete tableData[deviceName];\n                status.text+=\" disconnected\";\n                break;\n        }\n        if (tableRow.hasOwnProperty('sleepTime') && tableRow.hasOwnProperty('awakeTime')) {\n            msg.state.sleepRatio=tableRow.awakeTime / tableRow.sleepTime * 100;\n            // msg.state.sleepTime=msg.sleepTime;\n            // msg.state.awakeTime.msg.awakeTime;\n        }\n        success=true;\n        // -------------------------------------------------\n        \n        if (success) {\n            status.fill=\"green\"\n            status.text+=\" \"+triggerProperty+\"=\"+msg.state[triggerProperty];\n            node.status(status);\n        } else {\n            status.error({\"pluginName\":pluginName,triggerProperty:msg.state[triggerProperty],\"state\":msg.state})\n            status.text+=\" Error \"+triggerProperty+\"=\"+msg.state[triggerProperty];\n            node.status(status);           \n        }\n    }\n}\n// allways pass the original message (+ additional data as suitable)\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 376,
+        "y": 1156,
+        "wires": [
+            [
+                "4f0c0cf7.5a6a24"
+            ]
+        ],
+        "info": "# sleep timer\nMeasures the sleep and awake time and gives a ratio in %\n\n## context store\n\n`tableData` in node context to store sleep and awake events\n\n## property trigger\n`$state` state changes:\n- `sleeping` begin of sleep period\n- `ready` or `init` begin of awake period\n- `lost` device offline period not added to calculation\n- `diconnected` delete value in tableData\n\n## properties used / required\nproperty | required | unique\n-------- | -------- | -------\n`msg.state.$name` | **required** | **unique**\n\n\n## values added or modified\n\nproperty | modification | description | unit\n-------- | ------------ | ----------- | ----\n`msg.state.sleepMode` | new | device usiong sleep mode | *boolean*\n`msg.state.sleepRatio` | new | percentage of time running | *integer* _in %_\n`msg.state.sleepTime` | optional | time sleeping | *integer* _in seconds_\n`msg.state.awakeTime` | optional | time awake | *integer* _in seconds_"
+    },
+    {
+        "id": "4f0c0cf7.5a6a24",
+        "type": "function",
+        "z": "6a99f950.207c08",
+        "name": "pluginTemplate",
+        "func": "const pluginName=\"pluginTemplate\"; // give the plugin a unique name\nconst triggerProperty=\"uptime\"; // if the plugin triggers on one specific property you can specifie it here\nconst contextName=\"tableData\"; // name of context store\n\nif (msg.hasOwnProperty(\"payload\") && msg.payload.hasOwnProperty(\"command\")) {\n    switch (msg.payload.command) {\n        case \"deleteTable\":\n            context.set(contextName,undefined);\n            node.status({fill:\"yellow\",shape:\"dot\",text:contextName+\" deleted\"});\n            node.warn(\"[\"+pluginName+\"] \"+contextName+\"deleted\");\n            return msg;\n    }\n}\n\nvar status = {fill:\"red\",shape:\"dot\",text: \"payload=\"+msg.payload};\n// only trigger if msg.state exitst and contains the property $name as a unique identifier\nif (msg.hasOwnProperty(\"state\") && msg.topic!==undefined && msg.topic!==\"\") {\n    status.text=\"device=\";\n    status.text+=(msg.state.$name) ? msg.state.$name : msg.topic;\n    status.fill=\"yellow\";\n    // if the plugin needs to save context data\n    var deviceName = msg.topic;\n    var tableData = context.get(contextName);\n    if (tableData===undefined) {\n        tableData={};\n        context.set(contextName,tableData);\n    }\n    // if the plugin only reacts on certain values (i.e. uptime)\n    if (msg.state.hasOwnProperty(triggerProperty)) { // add additional triggers here\n        if (!tableData.hasOwnProperty(deviceName)) tableData[deviceName]={}\n        var tableRow=tableData[deviceName];\n        var success=false;\n        \n        // -------------------------------------------------\n        // place your code here\n        // if success leave with\n        success=true;\n        // -------------------------------------------------\n        \n        if (success) {\n            status.fill=\"green\"\n            status.text+=\" \"+triggerProperty+\"=\"+msg.state[triggerProperty];\n            node.status(status);\n        } else {\n            status.error({\"pluginName\":pluginName,triggerProperty:msg.state[triggerProperty],\"state\":msg.state})\n            status.text+=\" Error \"+triggerProperty+\"=\"+msg.state[triggerProperty];\n            node.status(status);           \n        }\n    }\n}\n// allways pass the original message (+ additional data as suitable)\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 386,
+        "y": 1207,
+        "wires": [
+            [
+                "d51a172e.3d9828"
+            ]
+        ],
+        "info": "# plugin template\nYou can use this template to write your own plugin. Please take the time and publish plugins others might like to use.\n\n## context store\n\n`tabledata` in node context. Using memory only (recomended unless usefull)\n\n## property trigger\n`uptime` period between boot and now _in seconds_\n\n## properties used / required\nproperty | required | unique\n-------- | -------- | -------\n`msg.state.$name` | **required** | **unique**\n`msg.state.uptime` | **required** |\n`msg.state.$lost` | **optional** |\n\n\n## values added or modified\nif the plugin modifies existing properties please make sure that the following flow and the table are aware!\nproperty | modification | description | unit\n-------- | ------------ | ----------- | ----\n`msg.state.newProperty` | new | average period between resets | _in ms_\n"
+    },
+    {
+        "id": "f69b4d29.97404",
+        "type": "homie-convention-device",
+        "z": "6a99f950.207c08",
+        "broker": "6bb8f98.7e5f308",
+        "name": "",
+        "deviceID": "[any]",
+        "nodeID": "[any]",
+        "propertyID": "iaq",
+        "topic": "[any]/[any]/iaq",
+        "infoAttributes": true,
+        "infoTiming": true,
+        "infoError": true,
+        "addLabel": "none",
+        "labelTopic": false,
+        "labelPayload": true,
+        "labelName": "",
+        "uiPlaceName": "",
+        "uiNode": "uiChart",
+        "uiControlDropdown": true,
+        "uiControlMinMax": true,
+        "uiColor1": "#ffffff",
+        "uiBgColor1": "#ffffff",
+        "uiColorON": "#ffffff",
+        "uiColorOFF": "#ffffff",
+        "uiColorPredicted": "#ffffff",
+        "uiUseColorPredicted": false,
+        "uiColorPredictedOff": "#ffffff",
+        "uiUseColorPredictedOff": false,
+        "uiFormat": false,
+        "uiTooltip": "",
+        "uiIcon1": "",
+        "uiIconON": "",
+        "uiIconOFF": "",
+        "uiSwitchPredicted": false,
+        "uiSwitchColorPredictedON": "#aaaaaa",
+        "uiSwitchColorPredictedOFF": "#aaaaaa",
+        "uiSwitchIconPredictedON": "fa-toggle-on",
+        "uiSwitchIconPredictedOFF": "fa-toggle-off",
+        "uiFormatColor": "homieString",
+        "settable": false,
+        "x": 182,
+        "y": 476,
+        "wires": [
+            [
+                "c572fff.7cfbb",
+                "eea9ff37.6909f",
+                "409137ca.c6bb88"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "eea9ff37.6909f",
+        "type": "debug",
+        "z": "6a99f950.207c08",
+        "name": "to chart",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 621,
+        "y": 510,
+        "wires": []
+    },
+    {
+        "id": "20280ef9.00eff2",
+        "type": "ui_chart",
+        "z": "6a99f950.207c08",
+        "name": "",
+        "group": "a92e4755.eedf68",
+        "order": 0,
+        "width": "24",
+        "height": "8",
+        "label": "",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "waiting for data",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "500",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 611,
+        "y": 459,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c572fff.7cfbb",
+        "type": "function",
+        "z": "6a99f950.207c08",
+        "name": "add Label",
+        "func": "var msgOut = {};\nvar tableEdit = flow.get(\"tableEdit\",\"file\");\nvar devicePath = 'mqtt://broker.hivemq.com:1883/healthy-indoors-project/'+msg.deviceId;\nif (tableEdit.hasOwnProperty(devicePath) && tableEdit[devicePath].hasOwnProperty('room')) {\n    msgOut.topic=tableEdit[devicePath].room;\n} else {\n    msgOut.topic=msg.deviceId;\n}\nmsgOut.payload=msg.value;\nreturn msgOut;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 434,
+        "y": 459,
+        "wires": [
+            [
+                "eea9ff37.6909f",
+                "20280ef9.00eff2"
+            ]
+        ],
+        "icon": "node-red/swap.svg"
+    },
+    {
+        "id": "52f16b2f.1879d4",
+        "type": "function",
+        "z": "6a99f950.207c08",
+        "name": "callback functions",
+        "func": "// Style IAQ progress bar\nvar color = function (value) {\n    if (value<51) return \"#00e600\";\n    if (value<101) return \"#8cff1a\";\n    if (value<151) return \"#ffff66\";\n    if (value<201) return \"#ffbf00\";\n    if (value<251) return \"#e60000\";\n    if (value<351) return \"#cc0099\";\n    return \"#993333\";\n}\n\n// add unit and fixed decimals\nvar value = function(cell, formatterParams, onRendered){\n    return cell.getValue().toFixed(2)+\" °C\"\n}\n\n// Stlye the row background color depending on accuracy\n//cell - the cell component\n//formatterParams - parameters set for the column\n//onRendered - function to call when the formatter has been rendered\n\nvar formatter = function(cell, formatterParams, onRendered){\n    var data = cell.getValue();\n    switch (data) {\n        case 0:\n            cell.getElement().style.backgroundColor = \"#c68e39\";             \n            cell.getElement().style.color = \"\";             \n            return \"started\";         \n        case 1:\n            cell.getElement().style.backgroundColor = \"#b34d91\";             \n            cell.getElement().style.color = \"\";             \n            return \"unshure\";         \n        case 2:      \n            cell.getElement().style.backgroundColor = \"#009999\";             \n            cell.getElement().style.color = \"\";             \n            return \"calibrating\";\n        case 3:\n            cell.getElement().style.backgroundColor = \"#339966\";             \n            cell.getElement().style.color = \"\";             \n            return \"calibrated\";\n    }\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 1077,
+        "y": 1428,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "fc4e59e1.2d52a8",
+        "type": "comment",
+        "z": "6a99f950.207c08",
+        "name": "IAQ Chart",
+        "info": "",
+        "x": 162,
+        "y": 425,
+        "wires": []
+    },
+    {
+        "id": "c492a4ba.713b48",
+        "type": "ui_artlessgauge",
+        "z": "6a99f950.207c08",
+        "group": "a92e4755.eedf68",
+        "order": 1,
+        "width": "24",
+        "height": "1",
+        "name": "",
+        "icon": "fa-fire",
+        "label": "maximum IAQ",
+        "unit": "",
+        "layout": "linear",
+        "decimals": 0,
+        "differential": false,
+        "minmax": false,
+        "colorTrack": "#555555",
+        "colorFromTheme": true,
+        "property": "payload",
+        "sectors": [
+            {
+                "val": 0,
+                "col": "#00e600",
+                "t": "min",
+                "dot": 6
+            },
+            {
+                "val": 50,
+                "col": "#8cff1a",
+                "t": "sec",
+                "dot": 6
+            },
+            {
+                "val": 100,
+                "col": "#ffff66",
+                "t": "sec",
+                "dot": 6
+            },
+            {
+                "val": 150,
+                "col": "#ffbf00",
+                "t": "sec",
+                "dot": 6
+            },
+            {
+                "val": 200,
+                "col": "#e60000",
+                "t": "sec",
+                "dot": 6
+            },
+            {
+                "val": 250,
+                "col": "#cc0099",
+                "t": "sec",
+                "dot": 6
+            },
+            {
+                "val": 350,
+                "col": "#993333",
+                "t": "sec",
+                "dot": 6
+            },
+            {
+                "val": 500,
+                "col": "#993333",
+                "t": "max",
+                "dot": 6
+            }
+        ],
+        "lineWidth": "5",
+        "bgcolorFromTheme": true,
+        "diffCenter": "",
+        "x": 641,
+        "y": 391,
+        "wires": [],
+        "info": "    if (value<51) return \"#00e600\";\n    if (value<101) return \"#8cff1a\";\n    if (value<151) return \"#ffff66\";\n    if (value<201) return \"#ffbf00\";\n    if (value<251) return \"#e60000\";\n    if (value<351) return \"#cc0099\";\n    return \"#993333\";"
+    },
+    {
+        "id": "34a78bc4.49b1f4",
+        "type": "rbe",
+        "z": "6a99f950.207c08",
+        "name": "",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "property": "payload",
+        "x": 663,
+        "y": 799,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "409137ca.c6bb88",
+        "type": "function",
+        "z": "6a99f950.207c08",
+        "name": "getMax",
+        "func": "var tableData = flow.get(\"tableData\") || {};\nvar msgOut = {};\nmsgOut.payload=msg.value;\n\nObject.keys(tableData).forEach(sample => {\n    if (tableData[sample].hasOwnProperty(msg.propertyId)) {\n        if (tableData[sample][msg.propertyId]>msgOut.payload) {\n            msgOut.payload=tableData[sample][msg.propertyId];\n        }\n    } \n})\n\nreturn msgOut;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 434,
+        "y": 391,
+        "wires": [
+            [
+                "c492a4ba.713b48"
+            ]
+        ]
+    },
+    {
+        "id": "88070f1c.adb71",
+        "type": "ui_group",
+        "z": "",
+        "name": "Sensor Devices",
+        "tab": "7b5c7daa.00c734",
+        "order": 2,
+        "disp": true,
+        "width": "24",
+        "collapse": true
+    },
+    {
+        "id": "6bb8f98.7e5f308",
+        "type": "homie-convention-broker-config",
+        "z": "",
+        "mqtt-host": "broker.hivemq.com",
+        "mqtt-port": "1883",
+        "usetls": false,
+        "name": "Node-RED",
+        "homieName": "Node-RED",
+        "homieFriendlyName": "Node-RED",
+        "homieRoot": "healthy-indoors-project",
+        "storeGlobal": true
+    },
+    {
+        "id": "a92e4755.eedf68",
+        "type": "ui_group",
+        "z": "",
+        "name": "Indoor Air Quality",
+        "tab": "7b5c7daa.00c734",
+        "order": 1,
+        "disp": true,
+        "width": "24",
+        "collapse": true
+    },
+    {
+        "id": "7b5c7daa.00c734",
+        "type": "ui_tab",
+        "z": "",
+        "name": "Healthy Indoors Project",
+        "icon": "wind",
+        "disabled": false,
+        "hidden": false
+    }
+]
