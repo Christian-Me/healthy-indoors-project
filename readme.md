@@ -6,12 +6,12 @@
 
 This version features a TFT monitor node (based on the e-paper version) giving more colorful charts
 
-![monitor node](https://raw.githubusercontent.com/Christian-Me/healthy-indoors-project/master/images/monitor-03.jpeg)
-even if TFT displays are not the best choice for battery powered nodes the small 1.14" TFT is nice
+![monitor node](https://raw.githubusercontent.com/Christian-Me/healthy-indoors-project/master/images/monitor-03.JPEG)
+even if TFT displays are not the best choice for battery powered nodes the small 1.14" TFT is nice (Note: The CO2 figures are CO2 equivalents by the VOC-Sensor - they are not really usable in the current setup)
 
 [changes and improvements you find in the changelog](changelog.md)
 
-[general information about the software development environment](software.md)
+[general information about the software development environment](./docs/software.md)
 
 <!-- START doctoc -->
 <!-- END doctoc -->
