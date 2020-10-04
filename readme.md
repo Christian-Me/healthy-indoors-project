@@ -12,6 +12,8 @@ even if TFT displays are not the best choice for battery powered nodes the small
 
 [Perhaps you like to simulate thermodynamics in real time](./docs/energy2D.md)
 
+![open a window](https://raw.githubusercontent.com/Christian-Me/healthy-indoors-project/master/docs/energy2D/open_window.gif)
+
 [changes and improvements you find in the changelog](changelog.md)
 
 [general information about the software development environment](./docs/software.md)
