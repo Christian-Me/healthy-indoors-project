@@ -1,6 +1,17 @@
-#  Healthy Indoors project (V0.0.1 ALPHA)
+#  Healthy Indoors project (V0.0.2 ALPHA)
 
 ![monitor node](https://raw.githubusercontent.com/Christian-Me/healthy-indoors-project/master/images/monitor-01.jpeg)
+
+## version 0.0.2
+
+This version features a TFT monitor node (based on the e-paper version) giving more colorful charts
+
+![monitor node](https://raw.githubusercontent.com/Christian-Me/healthy-indoors-project/master/images/monitor-03.jpeg)
+even if TFT displays are not the best choice for battery powered nodes the small 1.14" TFT is nice
+
+[changes and improvements you find in the changelog](changelog.md)
+
+[general information about the software development environment](software.md)
 
 <!-- START doctoc -->
 <!-- END doctoc -->
@@ -11,7 +22,9 @@ I started this project in September 2020 as a reaction of the global COVID-19 pa
 
 The need of an **as healthy as possible** indoor environment became necessary as it became obvious that [the virus is likely to be able to spread via aerosols](https://www.who.int/news-room/commentaries/detail/transmission-of-sars-cov-2-implications-for-infection-prevention-precautions) which could stay longer in the air and travel further inside rooms as droplets. 
 
-Reading this study by [Risk assessment of aerosols loaded with virus based on CO2-concentration](https://blogs.tu-berlin.de/hri_sars-cov-2/wp-content/uploads/sites/154/2020/08/hartmann_kriegel_2020_en_v3.pdf) and many other publications and working in an open space office environment I was wondering if it is possible to develop indicators for the employees to be aware of the risk and take action. As humans are not good in sensing CO2 levels (or other gas concentrations affecting the air quality) sensors could be a possible way to help. 
+Reading this study by [Risk assessment of aerosols loaded with virus based on CO2-concentration](https://blogs.tu-berlin.de/hri_sars-cov-2/wp-content/uploads/sites/154/2020/08/hartmann_kriegel_2020_en_v3.pdf) and many other publications and working in an open space office environment I was wondering if it is possible to develop indicators for the employees to be aware of the risk and take action. As humans are not good in sensing CO2 levels (or other gas concentrations affecting the air quality) sensors could be a possible way to help.
+
+[Lately I was pointed to this Video](https://youtu.be/u2rNX2T2Hew?t=364). **This made me aware that other factors (humidity, temperature, particles) are important to factor in.** because they effect the *Virus Health (survivability)* and *Immune System health*. It could be important not only to concentrate on CO2 levels as an indicator to reduce the potential concentration COVID-19 (or other) Viruses but also on factors which maybe reduce the survivability of the virus and (perhaps most important) the immune system health of the occupants of a building. We could perhaps raise the risk of an infection if we do too much ventilation(?) and lower the temperature and weaken our immune system?
 
 As we do not have to fit a [square container in a round canister](https://spacecenter.org/apollo-13-infographic-how-did-they-make-that-co2-scrubber/) when CO2 levels are rising. We can simply open the windows. In the beginning of the colder period and higher risk of infections of any kind the question is when, for how long. Second if the air exchange is sufficient. Mid of September Europe is seeing a second wave rising and as the outside temperatures will fall soon the need of an air exchange perhaps must be indicated due to the discomfort of cold air. Noisy street sounds might also prevent people from opening the windows.
 
@@ -27,7 +40,7 @@ This project do not claim to prevent anybody form dangerous diseases or other ha
 
 ## the Idea
 
-- develop a sensor network to detect accumulation of CO2 or other indicators
+- develop a sensor network to detect accumulation of CO2 or other indicators like Humidity, Tempearture and Particle Concentration
 - use multiple sensors to survey larger rooms, find "dead spots"
 - Survey the effects of mechanical ventilation, air filters and other methods to improve air quality
 - make the project open source that
@@ -50,8 +63,8 @@ This project do not claim to prevent anybody form dangerous diseases or other ha
 
 Nothing in this project is really new or innovative. Perhaps the local network idea is a little bit unusual as it does not need an access point as WiFi does. The goal is to establish an ad-hoc network with no setup. Simply place nodes in a room. All nodes in reach can talk to each other and exchange measurements. 
 
-- **sensor nodes** sending gas sensor readings onto the network
-- **monitor nodes** Displaying sensor data on siple (RGB) LEDs, LED arrays, LCD, TFT or e-paper Displays
+- **sensor nodes** sending environmental sensor readings onto the network
+- **monitor nodes** Displaying sensor data on siple (RGB) LEDs, LED arrays, LCD, TFT or e-paper Displays. Monitor nodes can include sensors too.
 - **bridge nodes** connecting the local sensor network to other networks like WiFi
 
 ### the micro-controller
@@ -90,9 +103,9 @@ some interesting gas sensors (CO2 and VOC)
 ![BME680](https://raw.githubusercontent.com/Christian-Me/healthy-indoors-project/master/images/BME680.JPEG)
 - **Senseair S8** promising infrared CO2 sensor from [Senseair](https://senseair.com/products/size-counts/s8-residential/) 400 to 2.000 ppm. (currently on delivery)
 
-- **MH-Z19B** Chinese CO2 infrared Sensor from [Winsen-Sensors](https://www.winsen-sensor.com/sensors/co2-sensor/mh-z19b.html) 0 to 2.000 ppm. (currently on delivery)
+- **MH-Z19B** Chinese CO2 infrared Sensor from [Winsen-Sensors](https://www.winsen-sensor.com/sensors/co2-sensor/mh-z19b.html) 0 to 2.000 ppm.
 
-- **CCS811** VOC sensor from [Sciosense](https://www.sciosense.com/products/environmental-sensors/ccs811-gas-sensor-solution/) seems interesting for battery operation as the sensor has a mcu integrated for VOC and eCO2 calculations providing a wake from deep sleep signal on programmable threshold alarm. (currently on delivery)
+- **CCS811** VOC sensor from [Sciosense](https://www.sciosense.com/products/environmental-sensors/ccs811-gas-sensor-solution/) seems interesting for battery operation as the sensor has a mcu integrated for VOC and eCO2 calculations providing a wake from deep sleep signal on programmable threshold alarm. **This sensor does not have a temperature and humidity sensor included! For more precise measurements a BME280, BME680 or similar should be included.**
 
 ### monitor nodes
 
