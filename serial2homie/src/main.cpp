@@ -72,24 +72,30 @@ void OnDataRecv(const uint8_t * mac_addr, const uint8_t *incomingData, int len) 
   char macStr[18];
   snprintf(macStr, sizeof(macStr), "%02x:%02x:%02x:%02x:%02x:%02x",
            mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
-  memcpy(&packet, incomingData, sizeof(packet));
+  if (len>(int) sizeof(packet)) len = sizeof(packet);
+  memcpy(&packet, incomingData, len);
 
-#ifdef SERIAL_TRACE  
-  Serial.printf("Board ID            : %s \n", macStr);
-  Serial.printf("Sensor Type         : %s \n", sensors[packet.sensorType]);
-  Serial.printf("Sensor accuracy     : %d \n", packet.accuracy);
-  Serial.printf("temperature         : %4.2f C\n", packet.temperature);
-  Serial.printf("humidity            : %4.2f %%\n", packet.humidity);
-  Serial.printf("pressure            : %.0f hPa\n", packet.pressure);
-  Serial.printf("gasResistance       : %.0f Ohm\n", packet.gasResistance);
-  Serial.printf("iaq                 : %.2f \n", packet.iaq);
-  Serial.printf("staticIaq           : %.2f \n", packet.staticIaq);
-  Serial.printf("co2Equivalent       : %.2f \n", packet.co2Equivalent);
-  Serial.printf("breathVocEquivalent : %.2f \n", packet.breathVocEquivalent);
+#ifdef SERIAL_DEBUG  
+  Serial.printf(" Packet length       : %d/%lu bytes\n", len, sizeof(packet));
+  Serial.printf(" Board ID            : %s \n", macStr);
+  Serial.printf(" Uptime              : %lu \n", packet.uptime);
+  Serial.printf(" Sensor ID           : %d \n", packet.sensorType);
+  Serial.printf(" Sensor Type         : %s \n", sensors[packet.sensorType]);
+  Serial.printf(" Sensor accuracy     : %d \n", packet.accuracy);
+  Serial.printf(" temperature         : %4.2f C\n", packet.temperature);
+  Serial.printf(" humidity            : %4.2f %%\n", packet.humidity);
+  Serial.printf(" pressure            : %.0f hPa\n", packet.pressure);
+  Serial.printf(" gasResistance       : %.0f Ohm\n", packet.gasResistance);
+  Serial.printf(" iaq                 : %.2f \n", packet.iaq);
+  Serial.printf(" staticIaq           : %.2f \n", packet.staticIaq);
+  Serial.printf(" co2Equivalent       : %.2f \n", packet.co2Equivalent);
+  Serial.printf(" breathVocEquivalent : %.2f \n", packet.breathVocEquivalent);
+  Serial.printf(" co2                 : %.2f \n", packet.co2);
+  Serial.printf(" pm2.5               : %.2f \n", packet.pm25);
+  Serial.printf(" Sensor accuracy     : %d \n", packet.accuracy);
   Serial.println();
 #endif
 
-  Serial.printf("Sensor accuracy     : %d \n", packet.accuracy);
   server.update(macStr, &packet);
   digitalWrite(LED_BUILTIN, HIGH);
 }

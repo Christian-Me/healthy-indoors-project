@@ -44,11 +44,30 @@ union neopixelColor {           // 32 bit color
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(60, PIN, LED_TYPE);
 
+class m_neopixel{
+  private:
+    bool initialized = false;
+    uint8_t sensorIndex = 0;
+    uint16_t sensorInterval = 30; // Inteval for sensor readings in seconds
+    unsigned long sensorTimeout = 0;
+    String output;
+    void checkSensorStatus(void);
+    void errLeds(void);
+    void loadState(void);
+    void updateState(void);
+  public:
+    s_mhz19(uint8_t);
+    bool available(void);
+    bool read(dataPacket*);
+    bool init(uint16_t delaySec);
+    void loop();
+};
+
 /*!
    @brief    initialize neopixel
     @param    brightness    maximum brightness
 */
-void m_neopixel_init (uint8_t brightness) {
+void m_neopixel::init (uint8_t brightness) {
     Serial.println(F("Initializing neopixel"));
     strip.begin();
     strip.setBrightness(brightness);

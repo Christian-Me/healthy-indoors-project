@@ -19,9 +19,10 @@ struct sensorType {
     uint8_t sensorIndex;
     struct propertyType properties[MAX_PROPERTIES];
     propertyType setProperty(String propertyId, float value) {
+        if (value == UNSUPPORTED_VALUE) return properties[0];
         uint8_t i = 0;
         for (i = 0; i < MAX_PROPERTIES; i++) {
-            if (properties[i].propertyId.startsWith(propertyId)) {
+            if (properties[i].propertyId.equals(propertyId)) {
                 break;
             }
             if (properties[i].propertyId.length()==0) {
@@ -40,11 +41,11 @@ struct sensorType {
     };
     float getValue(String propertyId) {
         for (uint8_t i = 0; i < MAX_PROPERTIES; i++) {
-            if (properties[i].propertyId.startsWith(propertyId)) {
+            if (properties[i].propertyId.equals(propertyId)) {
                 return properties[i].value;
             }
         }
-        return -1;
+        return UNSUPPORTED_VALUE;
     };
 };
 
@@ -126,6 +127,10 @@ sensorType* dataCollection::getSensor(char* deviceId, uint8_t sensorId, uint8_t 
 
             device->sensors[i].sensorId=sensorId;
             device->sensors[i].sensorIndex=sensorIndex;
+            for(uint8_t j = 0; j<MAX_PROPERTIES; j++) {
+                device->sensors[i].properties[j].propertyId="";
+                device->sensors[i].properties[j].value=UNSUPPORTED_VALUE;
+            }
             break;
         }
     }
@@ -137,7 +142,7 @@ propertyType* dataCollection::getProperty(char* deviceId, uint8_t sensorId, uint
     sensorType* sensor = getSensor(deviceId, sensorId, sensorIndex);
     uint8_t i = 0;
     for (i = 0; i < MAX_PROPERTIES; i++) {
-        if (sensor[i].properties->propertyId.startsWith(propertyId)) {
+        if (sensor[i].properties->propertyId.equals(propertyId)) {
             break;
         }
         if (sensor[i].properties->propertyId.length()==0) {
@@ -159,6 +164,7 @@ void dataCollection::cleanMemory() {
             devices[device].sensors[sensor].sensorIndex = 0;
             for (uint8_t property=0; property < MAX_PROPERTIES; property++) {
                 devices[device].sensors[sensor].properties[property].propertyId = "";
+                devices[device].sensors[sensor].properties[property].value = UNSUPPORTED_VALUE;
             }
         }
     }
@@ -178,12 +184,14 @@ bool dataCollection::getMinMaxAvg(String propertyId, float* min, float* max, flo
             for (uint8_t property=0; property < MAX_PROPERTIES; property++) {
                 if (devices[device].sensors[sensor].properties[property].propertyId == propertyId) {
                     value= devices[device].sensors[sensor].properties[property].value;
-                    if (value>*max) *max = value;
-                    if (value<*min) *min = value;
-                    *avg+=value;
-                    index++;
-                    result = true;
-                };
+                    if (value!=UNSUPPORTED_VALUE) { // sensors with limted properties
+                        if (value>*max) *max = value;
+                        if (value<*min) *min = value;
+                        *avg+=value;
+                        index++;
+                        result = true;
+                    }
+                }
             }
         }
     }
@@ -191,6 +199,8 @@ bool dataCollection::getMinMaxAvg(String propertyId, float* min, float* max, flo
         *avg=*avg/index;
     } else {
         *avg=0;
+        *min=0;
+        *max=0;
     }
     return result;
 }
@@ -212,10 +222,12 @@ void dataCollection::forEachProperty(String propertyId, onValueCB callback) {
 
 // update properties with new data package
 uint8_t dataCollection::update(char* deviceId = nullptr, dataPacket* data = nullptr) {
-    Serial.print(F("Collection update "));
-    Serial.print(sensors[data->sensorType]);
-    Serial.print(":");
-    Serial.println(data->sensorIndex);
+    #ifdef SERIAL_TRACE
+        Serial.print(F("Collection update "));
+        Serial.print(sensors[data->sensorType]);
+        Serial.print(":");
+        Serial.println(data->sensorIndex);
+    #endif
     deviceType* device = getDevice(deviceId);
     device->lastUpdate = millis();
     sensorType* sensor = getSensor(deviceId, data->sensorType, data->sensorIndex);
@@ -227,6 +239,8 @@ uint8_t dataCollection::update(char* deviceId = nullptr, dataPacket* data = null
     sensor->setProperty("co2Equivalent",data->co2Equivalent);
     sensor->setProperty("breathVocEquivalent",data->breathVocEquivalent);
     sensor->setProperty("accuracy",data->accuracy);
+    sensor->setProperty("co2",data->co2);
+    sensor->setProperty("pm25",data->pm25);
     return getDeviceIndex(deviceId);
 };
 

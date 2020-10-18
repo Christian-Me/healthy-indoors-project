@@ -16,6 +16,8 @@ even if TFT displays are not the best choice for battery powered nodes the small
 
 [changes and improvements you find in the changelog](changelog.md)
 
+[first case designs to print with any 3D-Printer](./3d-print/readme.md)
+
 [general information about the software development environment](./docs/software.md)
 
 <!-- START doctoc -->

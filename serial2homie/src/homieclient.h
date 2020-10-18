@@ -6,7 +6,7 @@
 #include <Ticker.h>
 #include <AsyncMqttClient.h>
 #include <string>
-#include "../../include/utils.h"
+#include "utils.h"
 
 #define MAX_PARAMETERS 10
 #define MAX_DEVICES 10
@@ -168,6 +168,10 @@ void homieClient::cleanMemory() {
     Serial.println(F(" ok"));
 }
 uint8_t homieClient::setHomieProperty(homieDeviceType* homieDevice, homieNodeType* homieNode,const char* propertyId,const char* datatype,const char* unit,const char* format, float value, uint8_t resendFrom = 0) {
+    if (value==UNSUPPORTED_VALUE) { // do not create or update property for values = UNSUPPORTED_VALUE
+        resendFrom++;
+        return resendFrom; 
+    }
     uint16_t result = 0;
     uint8_t i = 0;
     Serial.print(F(" Property: "));
@@ -315,7 +319,7 @@ void homieClient::setWill(const char*  device, const char* property, const char*
     #endif
     mqttClient.setWill(topic.c_str(), 2, true, payload);
     #ifdef SERIAL_TRACE
-        Serial.println(result);
+        Serial.println("ok");
     #endif
 }
 
@@ -420,7 +424,10 @@ bool homieClient::update(char* deviceId = nullptr, dataPacket* newPacket = nullp
     if (resendFrom==7) resendFrom = setHomieProperty(homieDevice, homieNode,"co2Equivalent","float","ppm","0:5000", currentPacket -> co2Equivalent, resendFrom);
     if (resendFrom==8) resendFrom = setHomieProperty(homieDevice, homieNode,"breathVocEquivalent","float","ppm","0:1", currentPacket -> breathVocEquivalent, resendFrom);
     if (resendFrom==9) resendFrom = setHomieProperty(homieDevice, homieNode,"accuracy","enum","","started,uncertain,calibrating,calibrated", currentPacket -> accuracy, resendFrom);
-    if (resendFrom==10) {
+    if (resendFrom==10) resendFrom = setHomieProperty(homieDevice, homieNode,"co2","float","ppm","0:5000", currentPacket -> co2, resendFrom);
+    if (resendFrom==11) resendFrom = setHomieProperty(homieDevice, homieNode,"pm25","float","ppm","0:5000", currentPacket -> pm25, resendFrom);
+    if (resendFrom==12) {
+        publishHomie(homieDevice->deviceId.c_str(), "$stats/uptime", toString(currentPacket->uptime,0).c_str());
         publishHomie(homieDevice->deviceId.c_str(), "$state", "ready");
         resendFrom = 0; // back to idle;
     }

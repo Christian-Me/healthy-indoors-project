@@ -1,4 +1,4 @@
-#include "rtcmem.h"
+//#include "rtcmem.h"
 #include "bsec.h"
 
 class BME680 {
@@ -6,8 +6,10 @@ class BME680 {
     Bsec iaqSensor;
     uint8_t bsecState[BSEC_MAX_STATE_BLOB_SIZE] = {0};
     uint16_t stateUpdateCounter = 0;
+    #ifdef USE_RTC
     rtcmem rtcMem;
     rtcBufferType rtcBuffer;
+    #endif
     void checkIaqSensorStatus(void);
     void errLeds(void);
     void loadState(void);
@@ -199,7 +201,7 @@ void BME680::errLeds(void)
 }
 
 void BME680::loadState(void)
-{
+{ /*
   uint32_t blobSize = rtcMem.read32(0);
   Serial.print(F("Reading state from RTC ("));
   Serial.print(blobSize);
@@ -235,12 +237,13 @@ void BME680::loadState(void)
     }
     Serial.println();
   }
+  */
 }
 
 void BME680::updateState(void)
-{
+{ /*
   bool update = false;
-  /* Set a trigger to save the state. Here, the state is saved every STATE_SAVE_PERIOD with the first state being saved once the algorithm achieves full calibration, i.e. iaqAccuracy = 3 */
+  // Set a trigger to save the state. Here, the state is saved every STATE_SAVE_PERIOD with the first state being saved once the algorithm achieves full calibration, i.e. iaqAccuracy = 3
   if (stateUpdateCounter == 0) {
     if (iaqSensor.iaqAccuracy >= 3) {
       Serial.print(F("State counter: "));
@@ -251,7 +254,7 @@ void BME680::updateState(void)
       stateUpdateCounter++;
     }
   } else {
-    /* Update every STATE_SAVE_PERIOD milliseconds */
+    // Update every STATE_SAVE_PERIOD milliseconds
     if ((stateUpdateCounter * STATE_SAVE_PERIOD) < millis()) {
       update = true;
       stateUpdateCounter++;
@@ -285,4 +288,5 @@ void BME680::updateState(void)
     }
     rtcMem.write32(0, BSEC_MAX_STATE_BLOB_SIZE);
   }
+  */
 }

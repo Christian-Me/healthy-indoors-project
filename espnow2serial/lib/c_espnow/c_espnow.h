@@ -6,7 +6,7 @@
 #endif
 
 #include <espnow.h>
-#include "../../include/utils.h"
+#include "../../lib/utils/utils.h"
 
 // handle esp-now specific functionality
 // plain c version

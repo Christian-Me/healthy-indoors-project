@@ -1,0 +1,9 @@
+{
+    "cSpell.words": [
+        "TVOC"
+    ],
+    "files.associations": {
+        "functional": "cpp",
+        "tuple": "cpp"
+    }
+}
